@@ -17,4 +17,8 @@ ENG_EPUB = $(patsubst %,%.epub,$(DOCS_BASE))
 
 EPUB_SCRIPT = scripts/prepare-epub.pl
 
+FILES = Makefile $(DOCS_SCREENPLAY_XHTML) \
+		$(DOCS_SCREENPLAY_TEXT) \
+		style.css style-heb.css \
+		README.html
 
