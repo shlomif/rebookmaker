@@ -15,3 +15,6 @@ DOCBOOK5_XSL_CUSTOM_FO_XSLT_STYLESHEET := $(HOMEPAGE)/lib/sgml/shlomif-docbook/x
 
 ENG_EPUB = $(patsubst %,%.epub,$(DOCS_BASE))
 
+EPUB_SCRIPT = scripts/prepare-epub.pl
+
+
