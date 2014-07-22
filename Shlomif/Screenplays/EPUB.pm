@@ -12,6 +12,8 @@ use MooX qw/late/;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
+use JSON::MaybeXS qw( encode_json );
+
 use CGI qw(escapeHTML);
 
 use Getopt::Long qw(GetOptions);
@@ -161,7 +163,9 @@ EOF
 
 sub output_json
 {
-    my ($self) = @_;
+    my ($self, $args) = @_;
+
+    my $data_tree = $args->{data};
 
     my $orig_dir = io->curdir->absolute . '';
 
@@ -169,10 +173,16 @@ sub output_json
 
     my $target_dir = $self->target_dir;
 
+    my $json_filename = $obj->json_filename;
+
+    io->file("$target_dir/$json_filename")->utf8->print(
+        encode_json($data_tree)
+    );
+
     {
         chdir ($target_dir);
 
-        my @cmd = ("ebookmaker", "--output", $epub_fn, $self->json_filename);
+        my @cmd = ("ebookmaker", "--output", $epub_fn, $json_filename);
         print join(' ', @cmd), "\n";
         system (@cmd)
             and die "cannot run ebookmaker - $!";
