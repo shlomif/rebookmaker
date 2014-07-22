@@ -19,9 +19,16 @@ use Getopt::Long qw(GetOptions);
 use File::Copy qw(copy);
 use File::Basename qw(dirname);
 
-has ['filename', 'target_dir', 'gfx', 'out_fn', ] => (is => 'rw', isa => 'Str');
+has ['filename', 'target_dir', 'gfx', 'out_fn', 'epub_filename'] => (is => 'rw', isa => 'Str');
 
 has 'images' => (is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
+
+sub json_filename
+{
+    my ($self) = @_;
+
+    return $self->epub_filename . '.json';
+}
 
 my $xhtml_ns = "http://www.w3.org/1999/xhtml";
 
@@ -135,9 +142,9 @@ EOF
         copy( "../graphics/$img_src", $dest );
     }
 
-foreach my $basename ('style.css')
-{
-    io->file( "$target_dir/$basename" )->utf8->print(<<'EOF');
+    foreach my $basename ('style.css')
+    {
+        io->file( "$target_dir/$basename" )->utf8->print(<<'EOF');
 body
 {
     direction: ltr;
@@ -147,7 +154,34 @@ body
     color: black;
 }
 EOF
+    }
+
+    return;
 }
+
+sub output_json
+{
+    my ($self) = @_;
+
+    my $orig_dir = io->curdir->absolute . '';
+
+    my $epub_fn = $self->epub_basename . ".epub";
+
+    my $target_dir = $self->target_dir;
+
+    {
+        chdir ($target_dir);
+
+        my @cmd = ("ebookmaker", "--output", $epub_fn, $self->json_filename);
+        print join(' ', @cmd), "\n";
+        system (@cmd)
+            and die "cannot run ebookmaker - $!";
+
+        unlink(glob('./scene*.xhtml'));
+        chdir ($orig_dir);
+    }
+
+    copy ( io->file("$target_dir/$epub_fn"), io->file($self->out_fn) );
 
     return;
 }
