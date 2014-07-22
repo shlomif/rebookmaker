@@ -25,6 +25,42 @@ has ['filename', 'target_dir', 'gfx', 'out_fn', 'epub_filename'] => (is => 'rw',
 
 has 'images' => (is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
 
+has 'common_json_data' => (isa => 'HashRef', is => 'ro', 'default' =>
+    sub {
+        return
+        +{
+            contents =>
+            [
+                {
+                    "type" => "toc",
+                    "source" => "toc.html"
+                },
+                {
+                    type => 'text',
+                    source => "scene-*.xhtml",
+                },
+            ],
+            toc =>
+            {
+                "depth" => 2,
+                "parse" => [ "text", ],
+                "generate" =>
+                {
+                    "title" => "Index"
+                },
+            },
+            guide =>
+            [
+                {
+                    type => "toc",
+                    title => "Index",
+                    href => "toc.html",
+                },
+            ],
+        };
+    },
+);
+
 sub json_filename
 {
     my ($self) = @_;
@@ -176,7 +212,12 @@ sub output_json
     my $json_filename = $obj->json_filename;
 
     io->file("$target_dir/$json_filename")->utf8->print(
-        encode_json($data_tree)
+        encode_json(
+            {
+                %{$self->common_json_data()},
+                %$data_tree
+            },
+        ),
     );
 
     {
