@@ -16,7 +16,12 @@ use CGI qw(escapeHTML);
 
 use Getopt::Long qw(GetOptions);
 
+use File::Copy qw(copy);
+use File::Basename qw(dirname);
+
 has ['filename', 'target_dir', 'gfx', 'out_fn', ] => (is => 'rw', isa => 'Str');
+
+has 'images' => (is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
 
 my $xhtml_ns = "http://www.w3.org/1999/xhtml";
 
@@ -119,9 +124,16 @@ EOF
 
     my $gfx = 'Green-d10-dice.png';
     $self->gfx($gfx);
-    io->file($target_dir . "/images/$gfx")->print(
-        io->file('../graphics/' . $gfx)->all
-    );
+    copy("../graphics/$gfx", "$target_dir/images/$gfx");
+
+    my $images = $self->images;
+    foreach my $img_src (keys(%$images))
+    {
+        my $dest = "$target_dir/$images->{$img_src}";
+
+        io->dir(dirname($dest))->mkpath;
+        copy( "../graphics/$img_src", $dest );
+    }
 
 foreach my $basename ('style.css')
 {
