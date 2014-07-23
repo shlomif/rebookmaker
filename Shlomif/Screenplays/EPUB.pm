@@ -21,7 +21,7 @@ use Getopt::Long qw(GetOptions);
 use File::Copy qw(copy);
 use File::Basename qw(dirname);
 
-has ['filename', 'target_dir', 'gfx', 'out_fn', 'epub_filename'] => (is => 'rw', isa => 'Str');
+has ['filename', 'target_dir', 'gfx', 'out_fn', 'epub_basename'] => (is => 'rw', isa => 'Str');
 
 has 'images' => (is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
 
@@ -65,7 +65,7 @@ sub json_filename
 {
     my ($self) = @_;
 
-    return $self->epub_filename . '.json';
+    return $self->epub_basename . '.json';
 }
 
 my $xhtml_ns = "http://www.w3.org/1999/xhtml";
@@ -169,6 +169,7 @@ EOF
 
     my $gfx = 'Green-d10-dice.png';
     $self->gfx($gfx);
+    io->dir("$target_dir/images")->mkpath;
     copy("../graphics/$gfx", "$target_dir/images/$gfx");
 
     my $images = $self->images;
@@ -209,7 +210,7 @@ sub output_json
 
     my $target_dir = $self->target_dir;
 
-    my $json_filename = $obj->json_filename;
+    my $json_filename = $self->json_filename;
 
     io->file("$target_dir/$json_filename")->utf8->print(
         encode_json(
@@ -232,7 +233,7 @@ sub output_json
         chdir ($orig_dir);
     }
 
-    copy ( io->file("$target_dir/$epub_fn"), io->file($self->out_fn) );
+    copy ( "$target_dir/$epub_fn", $self->out_fn );
 
     return;
 }
