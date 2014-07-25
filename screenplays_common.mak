@@ -66,8 +66,8 @@ openoffice: oohtml
 
 epub: $(ENG_EPUB)
 
-$(ENG_EPUB): $(DOCS_SCREENPLAY_XHTML) $(EPUB_SCRIPT)
-	perl -I$(SDIR) $(EPUB_SCRIPT) --output $@ $(DOCS_SCREENPLAY_XHTML)
+$(ENG_EPUB): %.epub: %.screenplay-text.xhtml $(EPUB_SCRIPT)
+	perl -I "$(SCREENPLAY_COMMON_INC_DIR)" $(EPUB_SCRIPT) --output $@ $<
 
 epub_ff: epub
 	firefox $(ENG_EPUB)
