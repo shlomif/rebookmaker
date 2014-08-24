@@ -82,3 +82,15 @@ rtf: $(DOCS_FICTION_RTF)
 $(DOCS_FICTION_ODT): $(DOCS_FICTION_DB5)
 	docbook2odf $< -o $@
 
+# DOCBOOK_RNG = http://www.docbook.org/xml/5.0/rng/docbook.rng
+
+DOCBOOK_RNG = ./rng/docbook.rng
+
+JING = jing $(DOCBOOK_RNG)
+
+# XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-ns-snapshot
+XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-snapshot/
+
+EPUB_SCRIPT = $(XSL_SNAPSHOT_HOME)/epub/bin/dbtoepub
+
+
