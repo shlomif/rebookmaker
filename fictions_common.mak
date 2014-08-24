@@ -117,3 +117,5 @@ epub_ok: epub
 clean:
 	rm -f $(DOCS_FICTION_XHTML) $(DOCS_FICTION_XML) $(HEB_STORY).db5.xml $(ENG_EPUB)
 
+DB5_TO_DB5_XSLT = docbook-to-docbook.xslt
+
