@@ -20,3 +20,8 @@ DOCS_FICTION_ODT = $(patsubst %,%.odt,$(STORY_LANGUAGE_BASES))
 DOCS_FICTION_HTML_FOR_OOO = $(patsubst %,%.for-openoffice.html,$(STORY_LANGUAGE_BASES))
 
 ENG_DB_PROCESSED = $(ENG_STORY).db5.xml
+
+ENG_DB_XSLT = docbook-epub-preproc.xslt
+ENG_DB_SOURCE = $(ENG_STORY).db5.xml
+
+ENG_EPUB_XSLT = $(ENG_DB_XSLT)
