@@ -40,3 +40,36 @@ odt: $(DOCS_FICTION_ODT)
 
 upload:
 	rsync -v --progress -a $(FILES) $${HOMEPAGE_SSH_PATH}/$(THE_ENEMY_DEST)/
+
+$(DOCS_FICTION_XML): %.fiction-xml.xml: %.fiction-text.txt
+	perl -MXML::Grammar::Fiction::App::FromProto -e 'run()' -- \
+	-o $@ $< && \
+	perl -i -lape 's/\s+$$//' $@
+
+DOCS_FICTION_XHTML__HEB = $(filter %-hebrew.fiction-text.xhtml,$(DOCS_FICTION_XHTML))
+DOCS_FICTION_XHTML__ENG = $(filter %-english.fiction-text.xhtml,$(DOCS_FICTION_XHTML))
+
+$(DOCS_FICTION_XHTML__HEB): %.fiction-text.xhtml: %.db5.xml
+	xsltproc --stringparam root.filename $@ \
+		--stringparam html.stylesheet "style-heb.css" \
+		--path $(DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH) \
+		-o $@ \
+		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
+	mv -f $@.html $@ && \
+	perl -i -lape 's/\s+$$//' $@
+
+$(DOCS_FICTION_XHTML__ENG): %.fiction-text.xhtml: %.db5.xml
+	xsltproc --stringparam root.filename $@ \
+		$(TO_XHTML_XSLT_COMMON_PARAMS) \
+		--path $(DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH) \
+		-o $@ \
+		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
+	mv -f $@.html $@ && \
+	perl -i -lape 's/\s+$$//' $@
+
+$(DOCS_FICTION_FO): %.fiction-text.fo : %.db5.xml
+	xsltproc --stringparam root.filename $@ \
+		--stringparam html.stylesheet "style-heb.css" \
+		--path $(DOCBOOK5_XSL_STYLESHEETS_FO_PATH) \
+		-o $@ \
+		$(DOCBOOK5_XSL_CUSTOM_FO_XSLT_STYLESHEET) $<
