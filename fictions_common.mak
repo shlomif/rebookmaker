@@ -93,4 +93,27 @@ XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-snapshot/
 
 EPUB_SCRIPT = $(XSL_SNAPSHOT_HOME)/epub/bin/dbtoepub
 
+$(DOCS_FICTION_HTML_FOR_OOO): %.for-openoffice.html: %.xhtml
+	cat $< | perl -lne 's{(</title>)}{$${1}<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />}; print unless m{\A<\?xml}' > $@
+
+oohtml: $(ENG_HTML_FOR_OOO) $(HEB_HTML_FOR_OOO)
+
+openoffice: oohtml
+	ooffice3.2 $(ENG_HTML_FOR_OOO)
+
+.PHONY: epub_ff
+
+epub: $(ENG_EPUB)
+
+epub_ff: epub
+	firefox $(ENG_EPUB)
+
+epub_ok: epub
+	okular $(ENG_EPUB)
+
+%.show:
+	@echo "$* = $($*)"
+
+clean:
+	rm -f $(DOCS_FICTION_XHTML) $(DOCS_FICTION_XML) $(HEB_STORY).db5.xml $(ENG_EPUB)
 
