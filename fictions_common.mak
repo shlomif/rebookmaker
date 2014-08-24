@@ -73,3 +73,12 @@ $(DOCS_FICTION_FO): %.fiction-text.fo : %.db5.xml
 		--path $(DOCBOOK5_XSL_STYLESHEETS_FO_PATH) \
 		-o $@ \
 		$(DOCBOOK5_XSL_CUSTOM_FO_XSLT_STYLESHEET) $<
+
+$(DOCS_FICTION_RTF): %.rtf: %.fo
+	fop -fo $< -rtf $@
+
+rtf: $(DOCS_FICTION_RTF)
+
+$(DOCS_FICTION_ODT): $(DOCS_FICTION_DB5)
+	docbook2odf $< -o $@
+
