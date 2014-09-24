@@ -14,7 +14,7 @@ use XML::LibXML::XPathContext;
 
 use JSON::MaybeXS qw( encode_json );
 
-use CGI qw(escapeHTML);
+use HTML::Widgets::NavMenu::EscapeHtml qw(escape_html);
 
 use Getopt::Long qw(GetOptions);
 
@@ -139,7 +139,7 @@ sub run
                     my $scene_xpc = _get_xpc($scene);
 
                     my $title = $scene_xpc->findnodes('descendant::xhtml:h1')->[0]->textContent();
-                    my $esc_title = escapeHTML($title);
+                    my $esc_title = escape_html($title);
 
                     my $scene_string = $scene->toString();
                     my $xmlns = q# xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"#;
