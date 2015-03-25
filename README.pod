@@ -1,0 +1,9 @@
+=encoding utf8
+
+=head1 Shlomif's Screenplay-XML and Fiction-XML Common files.
+
+These are common files for the Shlomi Fish’s homepage build system for:
+
+L<http://www.shlomifish.org/open-source/projects/XML-Grammar/Fiction/> .
+
+=cut
