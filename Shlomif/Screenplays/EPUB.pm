@@ -224,7 +224,7 @@ sub output_json
     {
         chdir ($target_dir);
 
-        my @cmd = ("ebookmaker", "--output", $epub_fn, $json_filename);
+        my @cmd = (($ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker"), "--output", $epub_fn, $json_filename);
         print join(' ', @cmd), "\n";
         system (@cmd)
             and die "cannot run ebookmaker - $!";
