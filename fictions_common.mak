@@ -86,8 +86,6 @@ $(DOCS_FICTION_ODT): $(DOCS_FICTION_DB5)
 
 DOCBOOK_RNG = $(SCREENPLAY_COMMON_INC_DIR)/rng/docbook.rng
 
-JING = jing $(DOCBOOK_RNG)
-
 # XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-ns-snapshot
 XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-snapshot/
 
