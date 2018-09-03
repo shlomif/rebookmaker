@@ -119,3 +119,8 @@ clean:
 
 DB5_TO_DB5_XSLT = docbook-to-docbook.xslt
 
+test: all
+	prove tests/*.t
+
+runtest: all
+	runprove tests/*.t
