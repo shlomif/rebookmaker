@@ -26,7 +26,7 @@ ENG_DB_SOURCE = $(ENG_STORY).db5.xml
 
 ENG_EPUB_XSLT = $(ENG_DB_XSLT)
 
-DOCBOOK5_XSL_STYLESHEETS_PATH := $(HOME)/Download/unpack/file/docbook/docbook-xsl-ns-snapshot
+DOCBOOK5_XSL_STYLESHEETS_PATH := /usr/share/sgml/docbook/xsl-ns-stylesheets
 
 HOMEPAGE := $(HOME)/Docs/homepage/homepage/trunk
 DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH := $(DOCBOOK5_XSL_STYLESHEETS_PATH)/xhtml
@@ -89,7 +89,9 @@ DOCBOOK_RNG = $(SCREENPLAY_COMMON_INC_DIR)/rng/docbook.rng
 # XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-ns-snapshot
 XSL_SNAPSHOT_HOME = $(HOME)/Download/unpack/file/docbook/docbook-xsl-snapshot/
 
-EPUB_SCRIPT = $(XSL_SNAPSHOT_HOME)/epub/bin/dbtoepub
+EPUB_SCRIPT = $(DOCBOOK5_XSL_STYLESHEETS_PATH)/epub/bin/dbtoepub
+EPUB_XSLT = lib/sgml/shlomif-docbook/docbook-epub-preproc.xslt
+DBTOEPUB = ruby $(EPUB_SCRIPT)
 
 $(DOCS_FICTION_HTML_FOR_OOO): %.for-openoffice.html: %.xhtml
 	cat $< | perl -lne 's{(</title>)}{$${1}<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />}; print unless m{\A<\?xml}' > $@
