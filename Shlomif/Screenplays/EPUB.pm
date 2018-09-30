@@ -105,7 +105,7 @@ sub run
     my $root_node = $xml->parse_file($filename);
     {
         my $scenes_list = _get_xpc($root_node)->findnodes(
-            q{//xhtml:div[@class='screenplay']/xhtml:div[@class='scene']/xhtml:div[@class='scene' and xhtml:h2]}
+            q{//xhtml:main[@class='screenplay']/xhtml:section[@class='scene']/xhtml:section[@class='scene' and xhtml:header/xhtml:h2]}
         )
             or die "Cannot find top-level scenes list.";
 
