@@ -3,7 +3,8 @@ package Shlomif::Screenplays::EPUB;
 use strict;
 use warnings;
 
-use IO::All;
+use Carp ();
+use Path::Tiny qw/ path /;
 
 use utf8;
 
@@ -19,42 +20,40 @@ use HTML::Widgets::NavMenu::EscapeHtml qw(escape_html);
 use Getopt::Long qw(GetOptions);
 
 use File::Copy qw(copy);
-use File::Basename qw(dirname);
 
-has ['filename', 'target_dir', 'gfx', 'out_fn', 'epub_basename'] => (is => 'rw', isa => 'Str');
+has [ 'filename', 'gfx', 'out_fn', 'epub_basename' ] =>
+    ( is => 'rw', isa => 'Str' );
 
-has 'images' => (is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
+has [ 'target_dir', ] => ( is => 'rw' );
+has 'images' => ( is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
 
-has 'common_json_data' => (isa => 'HashRef', is => 'ro', 'default' =>
-    sub {
-        return
-        +{
-            contents =>
-            [
+has 'common_json_data' => (
+    isa       => 'HashRef',
+    is        => 'ro',
+    'default' => sub {
+        return +{
+            contents => [
                 {
-                    "type" => "toc",
+                    "type"   => "toc",
                     "source" => "toc.html"
                 },
                 {
-                    type => 'text',
+                    type   => 'text',
                     source => "scene-*.xhtml",
                 },
             ],
-            toc =>
-            {
-                "depth" => 2,
-                "parse" => [ "text", ],
-                "generate" =>
-                {
+            toc => {
+                "depth"    => 2,
+                "parse"    => [ "text", ],
+                "generate" => {
                     "title" => "Index"
                 },
             },
-            guide =>
-            [
+            guide => [
                 {
-                    type => "toc",
+                    type  => "toc",
                     title => "Index",
-                    href => "toc.html",
+                    href  => "toc.html",
                 },
             ],
         };
@@ -74,7 +73,7 @@ sub _get_xpc
 {
     my ($node) = @_;
     my $xpc = XML::LibXML::XPathContext->new($node);
-    $xpc->registerNs("xhtml", $xhtml_ns);
+    $xpc->registerNs( "xhtml", $xhtml_ns );
 
     return $xpc;
 }
@@ -85,9 +84,8 @@ sub run
 
     my $out_fn;
 
-    GetOptions(
-        "output|o=s" => \$out_fn,
-    );
+    GetOptions( "output|o=s" => \$out_fn, )
+        or Carp::confess("GetOptions failed - $!");
 
     $self->out_fn($out_fn);
 
@@ -97,40 +95,44 @@ sub run
 
     $self->filename($filename);
 
-    my $target_dir = './for-epub-xhtmls/';
+    my $target_dir = Path::Tiny->tempdir;
     $self->target_dir($target_dir);
 
     # Prepare the objects.
-    my $xml = XML::LibXML->new;
+    my $xml       = XML::LibXML->new;
     my $root_node = $xml->parse_file($filename);
     {
-        my $scenes_list = _get_xpc($root_node)->findnodes(
-            q{//xhtml:main[@class='screenplay']/xhtml:section[@class='scene']/xhtml:section[@class='scene' and xhtml:header/xhtml:h2]}
-        )
-            or die "Cannot find top-level scenes list.";
+        my $scenes_list =
+            _get_xpc($root_node)
+            ->findnodes(
+q{//xhtml:main[@class='screenplay']/xhtml:section[@class='scene']/xhtml:section[@class='scene' and xhtml:header/xhtml:h2]}
+            ) or die "Cannot find top-level scenes list.";
 
         my $idx = 0;
-        $scenes_list->foreach(sub
-            {
+        $scenes_list->foreach(
+            sub {
                 my ($orig_scene) = @_;
 
-                # Commented out traces. No longer needed.
-                # print "\n\n[$idx]<<<<< " . $orig_scene->toString() . ">>>>\n\n";
-                # print "Foo ==" , (scalar($orig_scene->toString()) =~ /h3/g), "\n";
+            # Commented out traces. No longer needed.
+            # print "\n\n[$idx]<<<<< " . $orig_scene->toString() . ">>>>\n\n";
+            # print "Foo ==" , (scalar($orig_scene->toString()) =~ /h3/g), "\n";
 
                 my $scene = $orig_scene->cloneNode(1);
 
                 {
                     my $scene_xpc = _get_xpc($scene);
-                    foreach my $h_idx (2 .. 6)
+                    foreach my $h_idx ( 2 .. 6 )
                     {
-                        foreach my $h_tag ($scene_xpc->findnodes(qq{descendant::xhtml:h$h_idx}))
+                        foreach my $h_tag (
+                            $scene_xpc->findnodes(
+                                qq{descendant::xhtml:h$h_idx})
+                            )
                         {
                             my $copy = $h_tag->cloneNode(1);
-                            $copy->setNodeName('h' . ($h_idx-1));
+                            $copy->setNodeName( 'h' . ( $h_idx - 1 ) );
 
                             my $parent = $h_tag->parentNode;
-                            $parent->replaceChild($copy, $h_tag);
+                            $parent->replaceChild( $copy, $h_tag );
                         }
                     }
                 }
@@ -138,14 +140,20 @@ sub run
                 {
                     my $scene_xpc = _get_xpc($scene);
 
-                    my $title = $scene_xpc->findnodes('descendant::xhtml:h1')->[0]->textContent();
+                    my $title =
+                        $scene_xpc->findnodes('descendant::xhtml:h1')->[0]
+                        ->textContent();
                     my $esc_title = escape_html($title);
 
                     my $scene_string = $scene->toString();
-                    my $xmlns = q# xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"#;
+                    my $xmlns =
+q# xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"#;
                     $scene_string =~ s{(<\w+)\Q$xmlns\E( )}{$1$2}g;
 
-                    io->file($target_dir . "/scene-" . sprintf("%.4d", ($idx+1)) . ".xhtml")->utf8->print(<<"EOF");
+                    path(     $target_dir
+                            . "/scene-"
+                            . sprintf( "%.4d", ( $idx + 1 ) )
+                            . ".xhtml" )->spew_utf8(<<"EOF");
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE
     html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -169,21 +177,21 @@ EOF
 
     my $gfx = 'Green-d10-dice.png';
     $self->gfx($gfx);
-    io->dir("$target_dir/images")->mkpath;
-    copy("../graphics/$gfx", "$target_dir/images/$gfx");
+    path("$target_dir/images")->mkpath;
+    copy( "../graphics/$gfx", "$target_dir/images/$gfx" );
 
     my $images = $self->images;
-    foreach my $img_src (keys(%$images))
+    foreach my $img_src ( keys(%$images) )
     {
         my $dest = "$target_dir/$images->{$img_src}";
 
-        io->dir(dirname($dest))->mkpath;
+        path($dest)->parent->mkpath;
         copy( "../graphics/$img_src", $dest );
     }
 
     foreach my $basename ('style.css')
     {
-        io->file( "$target_dir/$basename" )->utf8->print(<<'EOF');
+        path("$target_dir/$basename")->spew_utf8(<<'EOF');
 body
 {
     direction: ltr;
@@ -200,40 +208,39 @@ EOF
 
 sub output_json
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $data_tree = $args->{data};
 
-    my $orig_dir = io->curdir->absolute . '';
-
-    my $epub_fn = $self->epub_basename . ".epub";
+    my $orig_dir = Path::Tiny->cwd->absolute;
 
     my $target_dir = $self->target_dir;
 
+    my $epub_fn =
+        $target_dir->child( $self->epub_basename . ".epub" )->absolute;
+
     my $json_filename = $self->json_filename;
 
-    io->file("$target_dir/$json_filename")->utf8->print(
-        encode_json(
-            {
-                %{$self->common_json_data()},
-                %$data_tree
-            },
-        ),
-    );
+    $target_dir->child($json_filename)
+        ->spew_utf8(
+        encode_json( { %{ $self->common_json_data() }, %$data_tree }, ),
+        );
 
     {
-        chdir ($target_dir);
+        chdir($target_dir);
 
-        my @cmd = (($ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker"), "--output", $epub_fn, $json_filename);
-        print join(' ', @cmd), "\n";
-        system (@cmd)
+        my @cmd = (
+            ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
+            "--output", $epub_fn, $json_filename
+        );
+        print join( ' ', @cmd ), "\n";
+        system(@cmd)
             and die "cannot run ebookmaker - $!";
 
-        unlink(glob('./scene*.xhtml'));
-        chdir ($orig_dir);
+        chdir($orig_dir);
     }
 
-    copy ( "$target_dir/$epub_fn", $self->out_fn );
+    $epub_fn->copy( $self->out_fn );
 
     return;
 }
