@@ -49,23 +49,20 @@ $(DOCS_FICTION_XML): %.fiction-xml.xml: %.fiction-text.txt
 DOCS_FICTION_XHTML__HEB = $(filter %-hebrew.fiction-text.xhtml,$(DOCS_FICTION_XHTML))
 DOCS_FICTION_XHTML__ENG = $(filter %-english.fiction-text.xhtml,$(DOCS_FICTION_XHTML))
 
-$(DOCS_FICTION_XHTML__HEB): %.fiction-text.xhtml: %.db5.xml
+_DOCS_FICTION__run_xslt = \
 	xsltproc --stringparam root.filename $@ \
-		--stringparam html.stylesheet "style-heb.css" \
+		$1 \
 		--path $(DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH) \
 		-o $@ \
 		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
 	mv -f $@.xhtml $@ && \
 	perl -i -lape 's/\s+$$//' $@
 
+$(DOCS_FICTION_XHTML__HEB): %.fiction-text.xhtml: %.db5.xml
+	$(call _DOCS_FICTION__run_xslt,--stringparam html.stylesheet "style-heb.css")
+
 $(DOCS_FICTION_XHTML__ENG): %.fiction-text.xhtml: %.db5.xml
-	xsltproc --stringparam root.filename $@ \
-		$(TO_XHTML_XSLT_COMMON_PARAMS) \
-		--path $(DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH) \
-		-o $@ \
-		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
-	mv -f $@.xhtml $@ && \
-	perl -i -lape 's/\s+$$//' $@
+	$(call _DOCS_FICTION__run_xslt,$(TO_XHTML_XSLT_COMMON_PARAMS))
 
 $(DOCS_FICTION_FO): %.fiction-text.fo : %.db5.xml
 	xsltproc --stringparam root.filename $@ \
