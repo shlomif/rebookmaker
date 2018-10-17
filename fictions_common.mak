@@ -64,7 +64,7 @@ $(DOCS_FICTION_XHTML__ENG): %.fiction-text.xhtml: %.db5.xml
 		--path $(DOCBOOK5_XSL_STYLESHEETS_XHTML_PATH) \
 		-o $@ \
 		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
-	mv -f $@.html $@ && \
+	mv -f $@.xhtml $@ && \
 	perl -i -lape 's/\s+$$//' $@
 
 $(DOCS_FICTION_FO): %.fiction-text.fo : %.db5.xml
