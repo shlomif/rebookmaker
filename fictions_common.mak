@@ -56,7 +56,7 @@ _DOCS_FICTION__run_xslt = \
 		-o $@ \
 		$(DOCBOOK5_XSL_CUSTOM_XSLT_STYLESHEET) $< && \
 	mv -f $@.xhtml $@ && \
-	perl -i -lape 's/\s+$$//' $@
+	perl -i -lape 's/\s+$$//' $@ && \
 	perl -i -lape 's&<header/>&&g;s&<footer/>&&g;' $@
 
 $(DOCS_FICTION_XHTML__HEB): %.fiction-text.xhtml: %.db5.xml
