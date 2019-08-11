@@ -23,6 +23,8 @@ use File::Copy qw(copy);
 
 has [ 'filename', 'gfx', 'out_fn', 'epub_basename' ] =>
     ( is => 'rw', isa => 'Str' );
+has script_dir =>
+    ( is => 'ro', default => sub { return path($0)->parent(2)->absolute; } );
 
 has [ 'target_dir', ] => ( is => 'rw' );
 has 'images' => ( is => 'ro', isa => 'HashRef[Str]', default => sub { +{}; }, );
@@ -178,7 +180,8 @@ EOF
     my $gfx = 'Green-d10-dice.png';
     $self->gfx($gfx);
     path("$target_dir/images")->mkpath;
-    copy( "../graphics/$gfx", "$target_dir/images/$gfx" );
+    my $script_dir = $self->script_dir;
+    copy( "$script_dir/../graphics/$gfx", "$target_dir/images/$gfx" );
 
     my $images = $self->images;
     foreach my $img_src ( keys(%$images) )
@@ -186,7 +189,7 @@ EOF
         my $dest = "$target_dir/$images->{$img_src}";
 
         path($dest)->parent->mkpath;
-        copy( "../graphics/$img_src", $dest );
+        copy( "$script_dir/../graphics/$img_src", $dest );
     }
 
     foreach my $basename ('style.css')
@@ -217,21 +220,23 @@ sub output_json
     my $target_dir = $self->target_dir;
 
     my $epub_fn =
-        $target_dir->child( $self->epub_basename . ".epub" )->absolute;
+        $target_dir->child( path( $self->epub_basename )->basename() . ".epub" )
+        ->absolute;
 
     my $json_filename = $self->json_filename;
+    my $json_abs =
+        $target_dir->child( path($json_filename)->basename )->absolute;
 
-    $target_dir->child($json_filename)
-        ->spew_utf8(
+    $json_abs->spew_utf8(
         encode_json( { %{ $self->common_json_data() }, %$data_tree }, ),
-        );
+    );
 
     {
         chdir($target_dir);
 
         my @cmd = (
             ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
-            "--output", $epub_fn, $json_filename
+            "--output", $epub_fn, $json_abs,
         );
         print join( ' ', @cmd ), "\n";
         system(@cmd)
