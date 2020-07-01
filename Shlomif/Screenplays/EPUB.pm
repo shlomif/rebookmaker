@@ -10,8 +10,8 @@ use utf8;
 
 use MooX qw/late/;
 
-use XML::LibXML;
-use XML::LibXML::XPathContext;
+use XML::LibXML               ();
+use XML::LibXML::XPathContext ();
 
 use JSON::MaybeXS qw( encode_json );
 
@@ -114,10 +114,6 @@ q{//xhtml:main[@class='screenplay']/xhtml:section[@class='scene']/xhtml:section[
         $scenes_list->foreach(
             sub {
                 my ($orig_scene) = @_;
-
-            # Commented out traces. No longer needed.
-            # print "\n\n[$idx]<<<<< " . $orig_scene->toString() . ">>>>\n\n";
-            # print "Foo ==" , (scalar($orig_scene->toString()) =~ /h3/g), "\n";
 
                 my $scene = $orig_scene->cloneNode(1);
 
@@ -238,9 +234,8 @@ sub output_json
             ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
             "--output", $epub_fn, $json_abs,
         );
-        print join( ' ', @cmd ), "\n";
         system(@cmd)
-            and die "cannot run ebookmaker - $!";
+            and die "cannot run ebookmaker <<@cmd>> - $!";
 
         chdir($orig_dir);
     }
