@@ -51,5 +51,5 @@ def _my_amend_epub(filename, json_fn):
     for img in sorted(list(images)):
         z.write(img, 'OEBPS/' + img)
     for html_src in sorted(list(htmls)):
-        z.write(html_src, 'OEBPS/' + html_src)
+        z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
     z.close()
