@@ -16,15 +16,60 @@ EPUB_CONTAINER = ('''<?xml version="1.0"?>
 </container>''').format(medtype1=medtype1, xmlns1=xmlns1)
 
 
+doctype = \
+    ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"' +
+     ' "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">')
+htmlstart = \
+    ('<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi=' +
+     '"http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" >')
+imgpref = '''<p class="center"><img id="coverimage" src="images/'''
+
+EPUB_COVER = '''<?xml version="1.0" encoding="UTF-8"?>
+{doctype}
+{htmlstart}
+<head>
+<title>{esc_title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+<style type="text/css">
+body {
+{tab}margin: 0;
+{tab}padding: 0;
+}
+img#coverimage {
+{tab}max-width: 100%;
+{tab}padding: 0;
+{tab}margin: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Generated file, modifying it is futile. -->
+
+{imgpref}{cover_image_fn}" alt="{esc_title}" /></p>
+
+</body>
+</html>'''
+
+
 def _my_amend_epub(filename, json_fn):
     from glob import glob
     from zipfile import ZipFile, ZIP_STORED
+    import html
     import json
     z = ZipFile(filename, 'a')
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
     htmls = set()
+    for html_src in ['cover.html']:
+        z.writestr(EPUB_COVER.format(
+            imgpref=imgpref, tab="\t", htmlstart=htmlstart,
+            cover_image_fn=j['cover'],
+            doctype=doctype,
+            esc_title=html.escape(j['title'])),
+            'OEBPS/' + html_src, ZIP_STORED)
     for item in j['contents']:
         if 'generate' not in item:
             item['generate'] = (item['type'] == 'toc')
