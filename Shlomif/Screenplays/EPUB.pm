@@ -64,9 +64,8 @@ has 'common_json_data' => (
 
 use Inline Python => <<'EOF';
 
-def my_amend_epub(args):
+def _my_amend_epub(filename):
     from zipfile import ZipFile, ZIP_STORED
-    filename = args['filename']
     z = ZipFile(filename, 'w')
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.close()
@@ -247,7 +246,7 @@ sub output_json
         );
         system(@cmd)
             and die "cannot run ebookmaker <<@cmd>> - $!";
-        my_amend_epub( { filename => $epub_fn } );
+        _my_amend_epub($epub_fn);
 
         chdir($orig_dir);
     }
