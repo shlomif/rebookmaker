@@ -64,11 +64,10 @@ has 'common_json_data' => (
 
 use Inline Python => <<'EOF';
 
+import shlomif_epub_maker
+
 def _my_amend_epub(filename):
-    from zipfile import ZipFile, ZIP_STORED
-    z = ZipFile(filename.decode("utf-8"), 'a')
-    z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
-    z.close()
+    return shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'))
 
 EOF
 
