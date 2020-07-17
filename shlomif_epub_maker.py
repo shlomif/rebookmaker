@@ -22,7 +22,7 @@ doctype = \
 htmlstart = \
     ('<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi=' +
      '"http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" >')
-imgpref = '''<p class="center"><img id="coverimage" src="images/'''
+imgpref = '''<p class="center"><img id="coverimage" src="'''
 
 EPUB_COVER = '''<?xml version="1.0" encoding="UTF-8"?>
 {doctype}
@@ -64,12 +64,14 @@ def _my_amend_epub(filename, json_fn):
     images = set()
     htmls = set()
     for html_src in ['cover.html']:
-        z.writestr(EPUB_COVER.format(
-            imgpref=imgpref, tab="\t", htmlstart=htmlstart,
-            cover_image_fn=j['cover'],
-            doctype=doctype,
-            esc_title=html.escape(j['title'])),
-            'OEBPS/' + html_src, ZIP_STORED)
+        z.writestr(
+            'OEBPS/' + html_src,
+            EPUB_COVER.format(
+                imgpref=imgpref, tab="\t", htmlstart=htmlstart,
+                cover_image_fn=j['cover'],
+                doctype=doctype,
+                esc_title=html.escape(j['title'])),
+            ZIP_STORED)
     for item in j['contents']:
         if 'generate' not in item:
             item['generate'] = (item['type'] == 'toc')
