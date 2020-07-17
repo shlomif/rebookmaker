@@ -149,4 +149,11 @@ def _my_amend_epub(filename, json_fn):
     )
     content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
+    template = env.get_template('tox-ncx' + '.jinja')
+    content_text = template.render(
+        author_name=j['authors'][0]['name'],
+        title=j['title'],
+    )
+    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
+    z.writestr("OEBPS/toc.ncx", content_text, ZIP_STORED)
     z.close()
