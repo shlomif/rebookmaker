@@ -63,7 +63,7 @@ def _my_amend_epub(filename, json_fn):
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
-    htmls = set()
+    htmls = []
     for html_src in ['cover.html']:
         z.writestr(
             'OEBPS/' + html_src,
@@ -84,7 +84,7 @@ def _my_amend_epub(filename, json_fn):
         else:
             html_sources = [html_src]
         for html_src in html_sources:
-            htmls.add(html_src)
+            htmls.append(html_src)
             with open(html_src, 'rt') as fh:
                 text = fh.read()
             from bs4 import BeautifulSoup
@@ -99,7 +99,7 @@ def _my_amend_epub(filename, json_fn):
     images = sorted(list(images))
     for img in images:
         z.write(img, 'OEBPS/' + img)
-    for html_src in sorted(list(htmls)):
+    for html_src in htmls:
         z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
     from jinja2 import Environment
     from jinja2 import FileSystemLoader
