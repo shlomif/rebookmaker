@@ -121,6 +121,7 @@ def _my_amend_epub(filename, json_fn):
         author_sorted=j['authors'][0]['sort'],
         author_name=j['authors'][0]['name'],
         dc_rights=j['rights'],
+        language=j['language'],
         publisher=j['publisher'],
         title=j['title'],
         url=j['identifier']['value'],

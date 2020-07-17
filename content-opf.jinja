@@ -8,21 +8,22 @@
     <dc:rights>{{ dc_rights }}</dc:rights>
     <dc:identifier id="bookId" opf:scheme="URL">{{ url }}</dc:identifier>
     <dc:publisher>{{ publisher }}</dc:publisher>
-    <dc:language>en-GB</dc:language>
+    <dc:language>{{ language }}</dc:language>
     <meta name="cover" content="coverimage" />
 </metadata>
 
 <manifest>
-{% for img in images0 %}
+{%- for img in images0 %}
     <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
 {% endfor %}
-{% for img in images1 %}
+
+{%- for img in images1 %}
     <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
 {% endfor %}
 
     <item id="toc" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
 
-{% for item in htmls0 %}
+{%- for item in htmls0 %}
     <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
 {% endfor %}
 
@@ -30,9 +31,11 @@
 </manifest>
 
 <spine toc="toc">
-{% for item in htmls0 %}
+
+{%- for item in htmls0 %}
     <itemref idref="{{ item.id }}"/>
 {% endfor %}
+
 </spine>
 
 <guide>
