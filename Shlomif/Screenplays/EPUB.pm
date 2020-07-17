@@ -66,8 +66,8 @@ use Inline Python => <<'EOF';
 
 import shlomif_epub_maker
 
-def _my_amend_epub(filename):
-    return shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'))
+def _my_amend_epub(filename, json_filename):
+    return shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'), json_filename.decode('utf-8'))
 
 EOF
 
@@ -245,7 +245,7 @@ sub output_json
         );
         system(@cmd)
             and die "cannot run ebookmaker <<@cmd>> - $!";
-        _my_amend_epub( $epub_fn->stringify() );
+        _my_amend_epub( $epub_fn->stringify(), $json_abs->stringify(), );
 
         chdir($orig_dir);
     }
