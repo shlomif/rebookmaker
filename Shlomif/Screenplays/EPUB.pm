@@ -66,7 +66,7 @@ use Inline Python => <<'EOF';
 
 def _my_amend_epub(filename):
     from zipfile import ZipFile, ZIP_STORED
-    z = ZipFile(filename.decode("utf-8"), 'w')
+    z = ZipFile(filename.decode("utf-8"), 'a')
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.close()
 
