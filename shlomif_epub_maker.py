@@ -24,6 +24,7 @@ def _my_amend_epub(filename, json_fn):
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
+    htmls = set()
     for item in j['contents']:
         if 'generate' not in item:
             item['generate'] = (item['type'] == 'toc')
@@ -35,6 +36,7 @@ def _my_amend_epub(filename, json_fn):
         else:
             html_sources = [html_src]
         for html_src in html_sources:
+            htmls.add(html_src)
             with open(html_src, 'rt') as fh:
                 text = fh.read()
             from bs4 import BeautifulSoup
@@ -48,4 +50,6 @@ def _my_amend_epub(filename, json_fn):
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
     for img in sorted(list(images)):
         z.write(img, 'OEBPS/' + img)
+    for html_src in sorted(list(htmls)):
+        z.write(html_src, 'OEBPS/' + html_src)
     z.close()
