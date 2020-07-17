@@ -21,4 +21,5 @@ def _my_amend_epub(filename):
     z = ZipFile(filename, 'a')
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
+    z.write("style.css", "OEBPS/style.css", ZIP_STORED)
     z.close()
