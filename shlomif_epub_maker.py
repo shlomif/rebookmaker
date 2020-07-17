@@ -123,7 +123,7 @@ def _my_amend_epub(filename, json_fn):
         dc_rights=j['rights'],
         publisher=j['publisher'],
         title=j['title'],
-        url=j['url'],
+        url=j['identifier']['value'],
         images0=[
             {
                 'id': 'coverimage',
