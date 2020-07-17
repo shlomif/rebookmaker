@@ -113,10 +113,14 @@ def _my_amend_epub(filename, json_fn):
     template = env.get_template('content-opf' + '.jinja')
 
     def _get_image_type(fn):
+        if fn.endswith('.jpeg'):
+            return 'image/jpeg'
         if fn.endswith('.jpg'):
             return 'image/jpeg'
         if fn.endswith('.png'):
             return 'image/png'
+        if fn.endswith('.webp'):
+            return 'image/webp'
         assert 0
     content_text = template.render(
         author_sorted=j['authors'][0]['sort'],

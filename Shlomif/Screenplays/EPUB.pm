@@ -65,9 +65,16 @@ has 'common_json_data' => (
 use Inline Python => <<'EOF';
 
 import shlomif_epub_maker
+import traceback
+import sys
 
 def _my_amend_epub(filename, json_filename):
-    return shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'), json_filename.decode('utf-8'))
+    try:
+        shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'), json_filename.decode('utf-8'))
+    except Exception as e:
+        traceback.print_tb(sys.exc_info()[2])
+        raise e
+
 
 EOF
 
