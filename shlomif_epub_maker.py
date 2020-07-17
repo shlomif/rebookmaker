@@ -136,6 +136,7 @@ def _my_amend_epub(filename, json_fn):
              'media_type': _get_image_type(fn)}
             for idx, fn in enumerate(images)
                 ],
+        guide=(j['guide'] if 'guide' in j else None),
         htmls0=[
             {'id': 'item'+str(idx), 'href': fn}
             for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)

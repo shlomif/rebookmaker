@@ -28,8 +28,7 @@
 {% for item in htmls0 %}    <itemref idref="{{ item.id }}"/>
 {% endfor %}</spine>
 
-<guide>
-    <reference type="toc" title="Index" href="toc.html"/>
-</guide>
+{% if guide %}<guide>{% for g in guide %}    <reference type="{{ g.type }}" title="{{ g.title }}" href="{{ g.href }}"/>
+{% endfor %}</guide>{% endif %}
 
 </package>
