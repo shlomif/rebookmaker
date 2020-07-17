@@ -32,15 +32,15 @@ EPUB_COVER = '''<?xml version="1.0" encoding="UTF-8"?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="style.css" />
 <style type="text/css">
-body {
+body {{
 {tab}margin: 0;
 {tab}padding: 0;
-}
-img#coverimage {
+}}
+img#coverimage {{
 {tab}max-width: 100%;
 {tab}padding: 0;
 {tab}margin: 0;
-}
+}}
 </style>
 </head>
 <body>
