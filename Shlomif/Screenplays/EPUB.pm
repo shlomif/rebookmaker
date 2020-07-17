@@ -246,7 +246,7 @@ sub output_json
         );
         system(@cmd)
             and die "cannot run ebookmaker <<@cmd>> - $!";
-        _my_amend_epub($epub_fn);
+        _my_amend_epub( $epub_fn->stringify() );
 
         chdir($orig_dir);
     }
