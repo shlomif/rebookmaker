@@ -59,6 +59,7 @@ def _my_amend_epub(filename, json_fn):
     from zipfile import ZipFile, ZIP_STORED
     import html
     import json
+    import re
     z = ZipFile(filename, 'a')
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
@@ -142,5 +143,6 @@ def _my_amend_epub(filename, json_fn):
             for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)
             ],
     )
+    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
     z.close()
