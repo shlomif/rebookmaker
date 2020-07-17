@@ -1,0 +1,42 @@
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="bookId">
+
+<!-- Generated file, modifying it is futile. -->
+
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:title>{{ title }}</dc:title>
+    <dc:creator opf:file-as="{{ author_sorted }}"  opf:role="aut">{{ author_name }}</dc:creator>
+    <dc:rights>{{ dc_rights }}</dc:rights>
+    <dc:identifier id="bookId" opf:scheme="URL">{{ url }}</dc:identifier>
+    <dc:publisher>{{ publisher }}</dc:publisher>
+    <dc:language>en-GB</dc:language>
+    <meta name="cover" content="coverimage" />
+</metadata>
+
+<manifest>
+{% for img in images0 %}
+    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% end %}
+{% for img in images1 %}
+    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% end %}
+
+    <item id="toc" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
+
+{% for item in htmls0 %}
+    <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
+{% end %}
+
+    <item id="css" href="style.css" media-type="text/css"/>
+</manifest>
+
+<spine toc="toc">
+{% for item in htmls0 %}
+    <itemref idref="{{ item.id }}"/>
+{% end %}
+</spine>
+
+<guide>
+    <reference type="toc" title="Index" href="toc.html"/>
+</guide>
+
+</package>

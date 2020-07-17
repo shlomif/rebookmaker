@@ -96,8 +96,49 @@ def _my_amend_epub(filename, json_fn):
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
-    for img in sorted(list(images)):
+    images = sorted(list(images))
+    for img in images:
         z.write(img, 'OEBPS/' + img)
     for html_src in sorted(list(htmls)):
         z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
+    from jinja2 import Environment
+    from jinja2 import FileSystemLoader
+    import os
+
+    env = Environment(
+            loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
+            )
+
+    template = env.get_template('content-opf' + '.jinja')
+
+    def _get_image_type(fn):
+        if fn.endswith('.jpg'):
+            return 'image/jpeg'
+        if fn.endswith('.png'):
+            return 'image/png'
+        assert 0
+    content_text = template.render(
+        author_sorted=j['authors'][0]['sort'],
+        author_name=j['authors'][0]['name'],
+        dc_rights=j['rights'],
+        publisher=j['publisher'],
+        title=j['title'],
+        url=j['url'],
+        images0=[
+            {
+                'id': 'coverimage',
+                'href': j['cover'], 'media_type': _get_image_type(j['cover'])
+            },
+        ],
+        images1=[
+            {'id': 'image' + str(idx), 'href': fn,
+             'media_type': _get_image_type(fn)}
+            for idx, fn in enumerate(images)
+                ],
+        htmls0=[
+            {'id': 'item'+str(idx), 'href': fn}
+            for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)
+            ],
+    )
+    z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
     z.close()
