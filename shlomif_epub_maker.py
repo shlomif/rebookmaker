@@ -50,7 +50,8 @@ img#coverimage {{
 {imgpref}{cover_image_fn}" alt="{esc_title}" /></p>
 
 </body>
-</html>'''
+</html>
+'''
 
 
 def _my_amend_epub(filename, json_fn):
