@@ -13,28 +13,24 @@
 </metadata>
 
 <manifest>
-{% for img in images0 -%}
-    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
-{%- endfor %}
+{% for img in images0 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% endfor %}
 
-{% for img in images1 -%}
-    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
-{%- endfor %}
+{% for img in images1 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% endfor %}
 
     <item id="toc" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
 
-{% for item in htmls0 -%}
-    <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
-{%- endfor %}
+{% for item in htmls0 %}    <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
+{% endfor %}
 
     <item id="css" href="style.css" media-type="text/css"/>
 </manifest>
 
 <spine toc="toc">
 
-{% for item in htmls0 -%}
-    <itemref idref="{{ item.id }}"/>
-{%- endfor %}
+{% for item in htmls0 %}    <itemref idref="{{ item.id }}"/>
+{% endfor %}
 
 </spine>
 
