@@ -171,7 +171,7 @@ def _my_amend_epub(filename, json_fn):
         nonlocal counter
         idx = start_idx
         ret = ''
-        prefix = (' '*4*(level-1)),
+        prefix = (' '*4*(level-1))
         while idx < len(nav_points):
             rec = nav_points[idx]
             if rec['level'] < level:
