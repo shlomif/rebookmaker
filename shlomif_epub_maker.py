@@ -178,13 +178,23 @@ def _my_amend_epub(filename, json_fn):
             if rec['level'] < level:
                 return ret, idx
             nonlocal toc_html_text
-            toc_html_text += (
-                '<div style="margin-top: 1em;">\n' +
-                '<p style="text-indent: 1em;">' +
-                '<a href="{href}">{text}</a></p>\n' +
-                '</div>\n').format(
-                text=rec['label'],
-                href=rec['href'])
+            if level == 1:
+                toc_html_text += (
+                    '<div style="margin-top: 1em;">\n' +
+                    '<p style="text-indent: 1em;">' +
+                    '<a href="{href}">{text}</a></p>\n' +
+                    '').format(
+                    text=rec['label'],
+                    href=rec['href'])
+            else:
+                toc_html_text += (
+                    '<p style="text-indent: {level}em;">' +
+                    '<a href="{href}">{text}</a></p>\n' +
+                    '').format(
+                    level=level,
+                    text=rec['label'],
+                    href=rec['href'])
+
             ret += (
                 '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                 '{p}{indent}<navLabel><text>{text}</text></navLabel>\n' +
@@ -206,6 +216,8 @@ def _my_amend_epub(filename, json_fn):
             ret += (
                 '{p}</navPoint>\n'
             ).format(p=prefix)
+            if level == 1:
+                toc_html_text += '</div>\n'
         return ret, idx
     nav_points_text = get_nav_points(0, 1)[0]
     content_text = template.render(
