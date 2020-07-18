@@ -66,6 +66,18 @@ img#coverimage {{
 '''
 
 
+def _get_image_type(fn):
+    if fn.endswith('.jpeg'):
+        return 'image/jpeg'
+    if fn.endswith('.jpg'):
+        return 'image/jpeg'
+    if fn.endswith('.png'):
+        return 'image/png'
+    if fn.endswith('.webp'):
+        return 'image/webp'
+    assert 0
+
+
 def _my_amend_epub(filename, json_fn):
     z = ZipFile(filename, 'w')
     with open(json_fn, 'rb') as fh:
@@ -134,18 +146,12 @@ def _my_amend_epub(filename, json_fn):
             loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
             )
 
-    template = env.get_template('content-opf' + '.jinja')
+    def _writestr(basefn, content_text):
+        z.writestr(
+            "OEBPS/" + basefn,
+            re.sub("[\\n\\r]*\\Z", "\n", content_text), ZIP_STORED)
 
-    def _get_image_type(fn):
-        if fn.endswith('.jpeg'):
-            return 'image/jpeg'
-        if fn.endswith('.jpg'):
-            return 'image/jpeg'
-        if fn.endswith('.png'):
-            return 'image/png'
-        if fn.endswith('.webp'):
-            return 'image/webp'
-        assert 0
+    template = env.get_template('content-opf' + '.jinja')
     content_text = template.render(
         author_sorted=j['authors'][0]['sort'],
         author_name=j['authors'][0]['name'],
@@ -172,8 +178,7 @@ def _my_amend_epub(filename, json_fn):
             for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)
             ],
     )
-    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
-    z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
+    _writestr("content.opf", content_text)
     template = env.get_template('toc-ncx' + '.jinja')
 
     counter = 1
@@ -231,12 +236,10 @@ def _my_amend_epub(filename, json_fn):
         title=j['title'],
         navPoints_text=nav_points_text
     )
-    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
-    z.writestr("OEBPS/toc.ncx", content_text, ZIP_STORED)
+    _writestr("toc.ncx", content_text)
     template = env.get_template('toc-html' + '.jinja')
     content_text = template.render(
         toc_html_text=toc_html_text,
     )
-    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
-    z.writestr("OEBPS/toc.html", content_text, ZIP_STORED)
+    _writestr("toc.html", content_text)
     z.close()
