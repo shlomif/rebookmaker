@@ -246,12 +246,15 @@ sub output_json
     {
         chdir($target_dir);
 
-        my @cmd = (
-            ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
-            "--output", $epub_fn, $json_abs,
-        );
-        system(@cmd)
-            and die "cannot run ebookmaker <<@cmd>> - $!";
+        if (0)
+        {
+            my @cmd = (
+                ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
+                "--output", $epub_fn, $json_abs,
+            );
+            system(@cmd)
+                and die "cannot run ebookmaker <<@cmd>> - $!";
+        }
         _my_amend_epub( $epub_fn->stringify(), $json_abs->stringify(), );
 
         chdir($orig_dir);

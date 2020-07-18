@@ -60,7 +60,7 @@ def _my_amend_epub(filename, json_fn):
     import html
     import json
     import re
-    z = ZipFile(filename, 'a')
+    z = ZipFile(filename, 'w')
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
