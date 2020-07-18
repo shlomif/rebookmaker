@@ -28,42 +28,7 @@ from jinja2 import FileSystemLoader
 INDENT_STEP = (' ' * 4)
 
 
-doctype = \
-    ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"' +
-     ' "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">')
-htmlstart = \
-    ('<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi=' +
-     '"http://www.w3.org/2001/XMLSchema-instance" xml:lang="en" >')
-imgpref = '''<p class="center"><img id="coverimage" src="'''
-
-EPUB_COVER = '''<?xml version="1.0" encoding="UTF-8"?>
-{doctype}
-{htmlstart}
-<head>
-<title>{esc_title}</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="style.css" />
-<style type="text/css">
-body {{
-{tab}margin: 0;
-{tab}padding: 0;
-}}
-img#coverimage {{
-{tab}max-width: 100%;
-{tab}padding: 0;
-{tab}margin: 0;
-}}
-</style>
-</head>
-<body>
-
-<!-- Generated file, modifying it is futile. -->
-
-{imgpref}{cover_image_fn}" alt="{esc_title}" /></p>
-
-</body>
-</html>
-'''
+EPUB_COVER = ''''''
 
 
 def _get_image_type(fn):
@@ -104,14 +69,14 @@ def _my_amend_epub(filename, json_fn):
         h_tags.append("h"+str(i))
     h_tags = tuple(h_tags)
     htmls = []
+    template = env.get_template('cover-html' + '.jinja')
     for html_src in ['cover.html']:
         z.writestr(
             'OEBPS/' + html_src,
-            EPUB_COVER.format(
-                imgpref=imgpref, tab="\t", htmlstart=htmlstart,
+            (template.render(
+                tab="\t",
                 cover_image_fn=cover_image_fn,
-                doctype=doctype,
-                esc_title=escape(j['title'])),
+                esc_title=escape(j['title'])) + "\n"),
             ZIP_STORED)
     nav_points = []
     for item in j['contents']:
