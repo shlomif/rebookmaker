@@ -89,8 +89,8 @@ def _my_amend_epub(filename, json_fn):
             html_sources = sorted(glob(html_src))
         else:
             html_sources = [html_src]
-        page_nav = []
         for html_src in html_sources:
+            page_nav = []
             htmls.append(html_src)
             with open(html_src, 'rt') as fh:
                 text = fh.read()
@@ -112,7 +112,7 @@ def _my_amend_epub(filename, json_fn):
                         'label': h.get_text(),
                     }
                     )
-        nav_points.append(page_nav)
+            nav_points.append(page_nav)
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
