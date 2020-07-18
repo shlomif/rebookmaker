@@ -166,6 +166,7 @@ def _my_amend_epub(filename, json_fn):
     template = env.get_template('toc-ncx' + '.jinja')
 
     counter = 1
+    toc_html_text = ''
 
     def get_nav_points(start_idx, level):
         nonlocal counter
@@ -176,6 +177,14 @@ def _my_amend_epub(filename, json_fn):
             rec = nav_points[idx]
             if rec['level'] < level:
                 return ret, idx
+            nonlocal toc_html_text
+            toc_html_text += (
+                '<div style="margin-top: 1em;">\n' +
+                '<p style="text-indent: 1em;">' +
+                '<a href="{href}">{text}</a></p>\n' +
+                '</div>\n').format(
+                text=rec['label'],
+                href=rec['href'])
             ret += (
                 '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                 '{p}{indent}<navLabel><text>{text}</text></navLabel>\n' +
@@ -206,4 +215,10 @@ def _my_amend_epub(filename, json_fn):
     )
     content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/toc.ncx", content_text, ZIP_STORED)
+    template = env.get_template('toc-html' + '.jinja')
+    content_text = template.render(
+        toc_html_text=toc_html_text,
+    )
+    content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
+    z.writestr("OEBPS/toc.html", content_text, ZIP_STORED)
     z.close()
