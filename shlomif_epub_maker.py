@@ -171,6 +171,7 @@ def _my_amend_epub(filename, json_fn):
         nonlocal counter
         idx = start_idx
         ret = ''
+        prefix = (' '*4*(level-1)),
         while idx < len(nav_points):
             rec = nav_points[idx]
             if rec['level'] < level:
@@ -179,9 +180,9 @@ def _my_amend_epub(filename, json_fn):
                 '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                 '{p}{indent}<navLabel><text>{text}</text></navLabel>\n' +
                 '{p}{indent}<content src="{href}"/>\n' +
-                '{p}</navPoint>\n'
+                ''
             ).format(
-                p=(' '*4*(level-1)),
+                p=prefix,
                 indent=(' '*4), text=rec['label'],
                 href=rec['href'], idx=counter)
             counter += 1
@@ -193,6 +194,9 @@ def _my_amend_epub(filename, json_fn):
                         next_idx, next_level)
                     ret += sub_ret
             idx = next_idx
+            ret += (
+                '{p}</navPoint>\n'
+            ).format(p=prefix)
         return ret, idx
     nav_points_text = get_nav_points(0, 1)[0]
     content_text = template.render(
