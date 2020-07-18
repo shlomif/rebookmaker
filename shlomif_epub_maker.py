@@ -89,6 +89,7 @@ def _my_amend_epub(filename, json_fn):
             html_sources = sorted(glob(html_src))
         else:
             html_sources = [html_src]
+        page_nav = []
         for html_src in html_sources:
             htmls.append(html_src)
             with open(html_src, 'rt') as fh:
@@ -104,13 +105,14 @@ def _my_amend_epub(filename, json_fn):
                     href = html_src+"#"+h['id']
                 else:
                     href = None
-                nav_points.append(
+                page_nav.append(
                     {
                         'level': int(h.name[-1]),
                         'href': href,
                         'label': h.get_text(),
                     }
                     )
+        nav_points.append(page_nav)
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
@@ -171,7 +173,7 @@ def _my_amend_epub(filename, json_fn):
     counter = 1
     toc_html_text = ''
 
-    def get_nav_points(start_idx, level):
+    def get_nav_points(nav_points, start_idx, level):
         nonlocal counter
         idx = start_idx
         ret = ''
@@ -181,8 +183,6 @@ def _my_amend_epub(filename, json_fn):
             if rec['level'] < level:
                 return ret, idx
             nonlocal toc_html_text
-            if level == 1:
-                toc_html_text += '<div style="margin-top: 1em;">\n'
             if rec['href']:
                 toc_html_text += (
                     '<p style="text-indent: {level}em;">' +
@@ -207,16 +207,19 @@ def _my_amend_epub(filename, json_fn):
                 next_level = nav_points[next_idx]['level']
                 if next_level > level:
                     sub_ret, next_idx = get_nav_points(
+                        nav_points,
                         next_idx, next_level)
                     ret += sub_ret
             idx = next_idx
             ret += (
                 '{p}</navPoint>\n'
             ).format(p=prefix)
-            if level == 1:
-                toc_html_text += '</div>\n'
         return ret, idx
-    nav_points_text = get_nav_points(0, 1)[0]
+    nav_points_text = ''
+    for n in nav_points:
+        toc_html_text += '<div style="margin-top: 1em;">\n'
+        nav_points_text += get_nav_points(n, 0, 1)[0]
+        toc_html_text += '</div>\n'
     content_text = template.render(
         author_name=j['authors'][0]['name'],
         title=j['title'],
