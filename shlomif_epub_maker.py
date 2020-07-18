@@ -26,14 +26,6 @@ from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
 INDENT_STEP = (' ' * 4)
-xmlns1 = "urn:oasis:names:tc:opendocument:xmlns:container"
-medtype1 = "application/oebps-package+xml"
-EPUB_CONTAINER = ('''<?xml version="1.0"?>
-<container version="1.0" xmlns="{xmlns1}">
-    <rootfiles>
-        <rootfile full-path="OEBPS/content.opf" media-type="{medtype1}"/>
-    </rootfiles>
-</container>''').format(medtype1=medtype1, xmlns1=xmlns1)
 
 
 doctype = \
@@ -98,6 +90,9 @@ class MyCounter(object):
 
 
 def _my_amend_epub(filename, json_fn):
+    env = Environment(
+        loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
+    )
     z = ZipFile(filename, 'w')
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
@@ -153,17 +148,14 @@ def _my_amend_epub(filename, json_fn):
                     )
             nav_points.append(page_nav)
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
-    z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
+    template = env.get_template('container-xml' + '.jinja')
+    z.writestr("META-INF/container.xml", template.render(), ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
     images = sorted(list(images))
     for img in (images + [cover_image_fn]):
         z.write(img, 'OEBPS/' + img)
     for html_src in htmls:
         z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
-
-    env = Environment(
-            loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
-            )
 
     def _writestr(basefn, content_text):
         z.writestr(
