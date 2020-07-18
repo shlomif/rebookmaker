@@ -64,6 +64,10 @@ def _my_amend_epub(filename, json_fn):
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
+    h_tags = []
+    for i in range(1, min(6, j['toc']['depth'])+1):
+        h_tags.append("h"+str(i))
+    h_tags = tuple(h_tags)
     htmls = []
     for html_src in ['cover.html']:
         z.writestr(
@@ -74,6 +78,7 @@ def _my_amend_epub(filename, json_fn):
                 doctype=doctype,
                 esc_title=html.escape(j['title'])),
             ZIP_STORED)
+    nav_points = []
     for item in j['contents']:
         if 'generate' not in item:
             item['generate'] = (item['type'] == 'toc')
@@ -94,6 +99,14 @@ def _my_amend_epub(filename, json_fn):
                 src = img['src']
                 if src:
                     images.add(src)
+            for h in soup.find_all(h_tags):
+                if 'id' in h:
+                    nav_points.append(
+                        {
+                            'href': html_src+"#"+h['id'],
+                            'label': h.get_text(),
+                        }
+                    )
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
@@ -150,9 +163,19 @@ def _my_amend_epub(filename, json_fn):
     content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
     template = env.get_template('toc-ncx' + '.jinja')
+    nav_points_text = ''
+    for idx, rec in enumerate(nav_points):
+        nav_points_text += (
+            '<navPoint id="nav{idx}" playOrder="{idx}">\n' +
+            '{indent}<navLabel><text>{text}</text></navLabel>\n' +
+            '{indent}<content src="{href}"/>\n' +
+            '</navPoint>\n'
+        ).format(
+                indent=(' '*4), text=rec['label'], href=rec['href'], idx=idx+1)
     content_text = template.render(
         author_name=j['authors'][0]['name'],
         title=j['title'],
+        navPoints_text=nav_points_text
     )
     content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/toc.ncx", content_text, ZIP_STORED)
