@@ -101,12 +101,15 @@ def _my_amend_epub(filename, json_fn):
                     images.add(src)
             for h in soup.find_all(h_tags):
                 if h.has_attr('id'):
-                    nav_points.append(
-                        {
-                            'level': int(h.name[-1]),
-                            'href': html_src+"#"+h['id'],
-                            'label': h.get_text(),
-                        }
+                    href = html_src+"#"+h['id']
+                else:
+                    href = None
+                nav_points.append(
+                    {
+                        'level': int(h.name[-1]),
+                        'href': href,
+                        'label': h.get_text(),
+                    }
                     )
     z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
@@ -179,14 +182,8 @@ def _my_amend_epub(filename, json_fn):
                 return ret, idx
             nonlocal toc_html_text
             if level == 1:
-                toc_html_text += (
-                    '<div style="margin-top: 1em;">\n' +
-                    '<p style="text-indent: 1em;">' +
-                    '<a href="{href}">{text}</a></p>\n' +
-                    '').format(
-                    text=rec['label'],
-                    href=rec['href'])
-            else:
+                toc_html_text += '<div style="margin-top: 1em;">\n'
+            if rec['href']:
                 toc_html_text += (
                     '<p style="text-indent: {level}em;">' +
                     '<a href="{href}">{text}</a></p>\n' +
