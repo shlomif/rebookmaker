@@ -6,7 +6,14 @@
 #
 # Distributed under the MIT license.
 
-import html
+try:
+    from html import escape
+except BaseException:
+    import cgi
+
+    def escape(s):
+        return cgi.escape(s, True)
+
 import json
 import os
 import re
@@ -109,7 +116,7 @@ def _my_amend_epub(filename, json_fn):
                 imgpref=imgpref, tab="\t", htmlstart=htmlstart,
                 cover_image_fn=cover_image_fn,
                 doctype=doctype,
-                esc_title=html.escape(j['title'])),
+                esc_title=escape(j['title'])),
             ZIP_STORED)
     nav_points = []
     for item in j['contents']:
