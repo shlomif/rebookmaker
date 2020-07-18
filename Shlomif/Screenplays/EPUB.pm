@@ -85,8 +85,6 @@ if ($@)
 {
     *_my_amend_epub = sub {
         my ( $epub_fn, $json_abs ) = @_;
-        local $ENV{DFN}    = $epub_fn;
-        local $ENV{JSONFN} = $json_abs;
         my @cmd = (
             ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
             "--output", $epub_fn, $json_abs,
