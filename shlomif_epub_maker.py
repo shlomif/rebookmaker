@@ -54,6 +54,9 @@ class MyCounter(object):
         return self.counter
 
 
+RE = re.compile("[\\n\\r]*\\Z")
+
+
 def _my_amend_epub(filename, json_fn):
     env = Environment(
         loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
@@ -84,11 +87,11 @@ def _my_amend_epub(filename, json_fn):
             item['generate'] = (item['type'] == 'toc')
         if item['generate']:
             continue
-        html_src = item['source']
-        if item['type'] == 'text' and '*' in html_src:
-            html_sources = sorted(glob(html_src))
+        source_spec = item['source']
+        if item['type'] == 'text' and '*' in source_spec:
+            html_sources = sorted(glob(source_spec))
         else:
-            html_sources = [html_src]
+            html_sources = [source_spec]
         for html_src in html_sources:
             page_nav = []
             htmls.append(html_src)
@@ -125,7 +128,9 @@ def _my_amend_epub(filename, json_fn):
     def _writestr(basefn, content_text):
         z.writestr(
             "OEBPS/" + basefn,
-            re.sub("[\\n\\r]*\\Z", "\n", content_text), ZIP_STORED)
+            RE.sub("\n", content_text),
+            ZIP_STORED
+        )
 
     template = env.get_template('content-opf' + '.jinja')
     content_text = template.render(
