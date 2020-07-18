@@ -65,7 +65,7 @@ def _my_amend_epub(filename, json_fn):
         j = json.load(fh)
     images = set()
     cover_image_fn = j['cover']
-    images.add(cover_image_fn)
+    # images.add(cover_image_fn)
     h_tags = []
     for i in range(1, min(6, j['toc']['depth'])+1):
         h_tags.append("h"+str(i))
@@ -119,7 +119,7 @@ def _my_amend_epub(filename, json_fn):
     z.writestr("META-INF/container.xml", EPUB_CONTAINER, ZIP_STORED)
     z.write("style.css", "OEBPS/style.css", ZIP_STORED)
     images = sorted(list(images))
-    for img in images:
+    for img in (images + [cover_image_fn]):
         z.write(img, 'OEBPS/' + img)
     for html_src in htmls:
         z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
