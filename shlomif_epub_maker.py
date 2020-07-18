@@ -79,6 +79,16 @@ def _get_image_type(fn):
     assert 0
 
 
+class MyCounter(object):
+    def __init__(self):
+        self.counter = 0
+
+    def get_idx(self):
+        """docstring for get_idx"""
+        self.counter += 1
+        return self.counter
+
+
 def _my_amend_epub(filename, json_fn):
     z = ZipFile(filename, 'w')
     with open(json_fn, 'rb') as fh:
@@ -182,11 +192,9 @@ def _my_amend_epub(filename, json_fn):
     _writestr("content.opf", content_text)
     template = env.get_template('toc-ncx' + '.jinja')
 
-    counter = 1
     toc_html_text = ''
 
-    def get_nav_points(nav_points, start_idx, level):
-        nonlocal counter
+    def get_nav_points(counter, nav_points, start_idx, level):
         idx = start_idx
         ret = ''
         prefix = (INDENT_STEP * (level-1))
@@ -214,13 +222,13 @@ def _my_amend_epub(filename, json_fn):
                 p=prefix,
                 indent=INDENT_STEP,
                 label=label,
-                href=href, idx=counter)
-            counter += 1
+                href=href, idx=counter.get_idx())
             next_idx = idx + 1
             if next_idx < len(nav_points):
                 next_level = nav_points[next_idx]['level']
                 if next_level > level:
                     sub_ret, next_idx = get_nav_points(
+                        counter,
                         nav_points,
                         next_idx, next_level)
                     ret += sub_ret
@@ -230,9 +238,10 @@ def _my_amend_epub(filename, json_fn):
             ).format(p=prefix)
         return ret, idx
     nav_points_text = ''
+    counter = MyCounter()
     for n in nav_points:
         toc_html_text += '<div style="margin-top: 1em;">\n'
-        nav_points_text += get_nav_points(n, 0, 1)[0]
+        nav_points_text += get_nav_points(counter, n, 0, 1)[0]
         toc_html_text += '</div>\n'
     content_text = template.render(
         author_name=j['authors'][0]['name'],
