@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
+INDENT_STEP = (' ' * 4)
 xmlns1 = "urn:oasis:names:tc:opendocument:xmlns:container"
 medtype1 = "application/oebps-package+xml"
 EPUB_CONTAINER = ('''<?xml version="1.0"?>
@@ -188,30 +189,32 @@ def _my_amend_epub(filename, json_fn):
         nonlocal counter
         idx = start_idx
         ret = ''
-        prefix = (' '*4*(level-1))
+        prefix = (INDENT_STEP * (level-1))
         while idx < len(nav_points):
             rec = nav_points[idx]
             if rec['level'] < level:
                 return ret, idx
             nonlocal toc_html_text
-            if rec['href']:
-                toc_html_text += (
-                    '<p style="text-indent: {level}em;">' +
-                    '<a href="{href}">{text}</a></p>\n' +
-                    '').format(
-                    level=level,
-                    text=rec['label'],
-                    href=rec['href'])
+            href = rec['href']
+            label = rec['label']
+            toc_html_text += (
+                '<p style="text-indent: {level}em;">' +
+                '<a href="{href}">{label}</a></p>\n' +
+                '').format(
+                level=level,
+                label=label,
+                href=href)
 
             ret += (
                 '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
-                '{p}{indent}<navLabel><text>{text}</text></navLabel>\n' +
+                '{p}{indent}<navLabel><text>{label}</text></navLabel>\n' +
                 '{p}{indent}<content src="{href}"/>\n' +
                 ''
             ).format(
                 p=prefix,
-                indent=(' '*4), text=rec['label'],
-                href=rec['href'], idx=counter)
+                indent=INDENT_STEP,
+                label=label,
+                href=href, idx=counter)
             counter += 1
             next_idx = idx + 1
             if next_idx < len(nav_points):
