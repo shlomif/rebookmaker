@@ -62,7 +62,9 @@ has 'common_json_data' => (
     },
 );
 
-use Inline Python => <<'EOF';
+eval {
+    require Inline;
+    Inline->import( 'Python' => <<'EOF');
 
 import shlomif_epub_maker
 import traceback
@@ -77,6 +79,23 @@ def _my_amend_epub(filename, json_filename):
 
 
 EOF
+};
+
+if ($@)
+{
+    *_my_amend_epub = sub {
+        my ( $epub_fn, $json_abs ) = @_;
+        local $ENV{DFN}    = $epub_fn;
+        local $ENV{JSONFN} = $json_abs;
+        my @cmd = (
+            ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
+            "--output", $epub_fn, $json_abs,
+        );
+        system(@cmd)
+            and die "cannot run ebookmaker <<@cmd>> - $!";
+        return;
+    };
+}
 
 sub json_filename
 {
@@ -246,15 +265,6 @@ sub output_json
     {
         chdir($target_dir);
 
-        if (0)
-        {
-            my @cmd = (
-                ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
-                "--output", $epub_fn, $json_abs,
-            );
-            system(@cmd)
-                and die "cannot run ebookmaker <<@cmd>> - $!";
-        }
         _my_amend_epub( $epub_fn->stringify(), $json_abs->stringify(), );
 
         chdir($orig_dir);
