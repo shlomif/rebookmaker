@@ -100,7 +100,7 @@ def _my_amend_epub(filename, json_fn):
                 if src:
                     images.add(src)
             for h in soup.find_all(h_tags):
-                if 'id' in h:
+                if h.has_attr('id'):
                     nav_points.append(
                         {
                             'href': html_src+"#"+h['id'],
