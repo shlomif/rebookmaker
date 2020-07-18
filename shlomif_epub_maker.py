@@ -186,10 +186,12 @@ def _my_amend_epub(filename, json_fn):
                 href=rec['href'], idx=counter)
             counter += 1
             next_idx = idx + 1
-            if nav_points[next_idx]['level'] > level:
-                sub_ret, next_idx = get_nav_points(
-                    next_idx, nav_points[next_idx]['level'])
-                ret += sub_ret
+            if next_idx < len(nav_points):
+                next_level = nav_points[next_idx]['level']
+                if next_level > level:
+                    sub_ret, next_idx = get_nav_points(
+                        next_idx, next_level)
+                    ret += sub_ret
             idx = next_idx
         return ret, idx
     nav_points_text = get_nav_points(0, 1)[0]
