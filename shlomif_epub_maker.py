@@ -6,6 +6,18 @@
 #
 # Distributed under the MIT license.
 
+import html
+import json
+import os
+import re
+from glob import glob
+from zipfile import ZIP_STORED, ZipFile
+
+from bs4 import BeautifulSoup
+
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
 xmlns1 = "urn:oasis:names:tc:opendocument:xmlns:container"
 medtype1 = "application/oebps-package+xml"
 EPUB_CONTAINER = ('''<?xml version="1.0"?>
@@ -55,11 +67,6 @@ img#coverimage {{
 
 
 def _my_amend_epub(filename, json_fn):
-    from glob import glob
-    from zipfile import ZipFile, ZIP_STORED
-    import html
-    import json
-    import re
     z = ZipFile(filename, 'w')
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
@@ -96,7 +103,6 @@ def _my_amend_epub(filename, json_fn):
             htmls.append(html_src)
             with open(html_src, 'rt') as fh:
                 text = fh.read()
-            from bs4 import BeautifulSoup
             soup = BeautifulSoup(text, 'lxml')
             for img in soup.find_all('img'):
                 src = img['src']
@@ -123,9 +129,6 @@ def _my_amend_epub(filename, json_fn):
         z.write(img, 'OEBPS/' + img)
     for html_src in htmls:
         z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
-    from jinja2 import Environment
-    from jinja2 import FileSystemLoader
-    import os
 
     env = Environment(
             loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
