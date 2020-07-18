@@ -103,6 +103,7 @@ def _my_amend_epub(filename, json_fn):
                 if h.has_attr('id'):
                     nav_points.append(
                         {
+                            'level': int(h.name[-1]),
                             'href': html_src+"#"+h['id'],
                             'label': h.get_text(),
                         }
@@ -163,15 +164,35 @@ def _my_amend_epub(filename, json_fn):
     content_text = re.sub("[\\n\\r]*\\Z", "\n", content_text)
     z.writestr("OEBPS/content.opf", content_text, ZIP_STORED)
     template = env.get_template('toc-ncx' + '.jinja')
-    nav_points_text = ''
-    for idx, rec in enumerate(nav_points):
-        nav_points_text += (
-            '<navPoint id="nav{idx}" playOrder="{idx}">\n' +
-            '{indent}<navLabel><text>{text}</text></navLabel>\n' +
-            '{indent}<content src="{href}"/>\n' +
-            '</navPoint>\n'
-        ).format(
-                indent=(' '*4), text=rec['label'], href=rec['href'], idx=idx+1)
+
+    counter = 1
+
+    def get_nav_points(start_idx, level):
+        nonlocal counter
+        idx = start_idx
+        ret = ''
+        while idx < len(nav_points):
+            rec = nav_points[idx]
+            if rec['level'] < level:
+                return ret, idx
+            ret += (
+                '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
+                '{p}{indent}<navLabel><text>{text}</text></navLabel>\n' +
+                '{p}{indent}<content src="{href}"/>\n' +
+                '{p}</navPoint>\n'
+            ).format(
+                p=(' '*4*(level-1)),
+                indent=(' '*4), text=rec['label'],
+                href=rec['href'], idx=counter)
+            counter += 1
+            next_idx = idx + 1
+            if nav_points[next_idx]['level'] > level:
+                sub_ret, next_idx = get_nav_points(
+                    next_idx, nav_points[next_idx]['level'])
+                ret += sub_ret
+            idx = next_idx
+        return ret, idx
+    nav_points_text = get_nav_points(0, 1)[0]
     content_text = template.render(
         author_name=j['authors'][0]['name'],
         title=j['title'],
