@@ -64,6 +64,8 @@ def _my_amend_epub(filename, json_fn):
     with open(json_fn, 'rb') as fh:
         j = json.load(fh)
     images = set()
+    cover_image_fn = j['cover']
+    images.add(cover_image_fn)
     h_tags = []
     for i in range(1, min(6, j['toc']['depth'])+1):
         h_tags.append("h"+str(i))
@@ -74,7 +76,7 @@ def _my_amend_epub(filename, json_fn):
             'OEBPS/' + html_src,
             EPUB_COVER.format(
                 imgpref=imgpref, tab="\t", htmlstart=htmlstart,
-                cover_image_fn=j['cover'],
+                cover_image_fn=cover_image_fn,
                 doctype=doctype,
                 esc_title=html.escape(j['title'])),
             ZIP_STORED)
@@ -152,7 +154,8 @@ def _my_amend_epub(filename, json_fn):
         images0=[
             {
                 'id': 'coverimage',
-                'href': j['cover'], 'media_type': _get_image_type(j['cover'])
+                'href': cover_image_fn,
+                'media_type': _get_image_type(cover_image_fn),
             },
         ],
         images1=[
