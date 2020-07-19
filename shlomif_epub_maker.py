@@ -6,14 +6,6 @@
 #
 # Distributed under the MIT license.
 
-try:
-    from html import escape
-except BaseException:
-    import cgi
-
-    def escape(s):
-        return cgi.escape(s, True)
-
 import json
 import os
 import re
@@ -22,6 +14,7 @@ from zipfile import ZIP_STORED, ZipFile
 
 from bs4 import BeautifulSoup
 
+import jinja2
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -43,10 +36,10 @@ def _get_image_type(fn):
     assert 0
 
 
-class MyCounter(object):
+class MyCounter:
     def __init__(self):
         self.counter = 0
-        self.toc_html_text = ''
+        self.toc_html_text = jinja2.Markup('')
 
     def get_idx(self):
         """docstring for get_idx"""
@@ -57,10 +50,15 @@ class MyCounter(object):
 RE = re.compile("[\\n\\r]*\\Z")
 
 
-class EbookMaker(object):
+class EbookMaker:
     """docstring for EbookMaker"""
     def __init__(self):
         self._env = Environment(
+            autoescape=jinja2.select_autoescape(
+                disabled_extensions=('nonenone',),
+                default=True,
+                default_for_string=True,
+            ),
             loader=FileSystemLoader([
                 os.getenv("SCREENPLAY_COMMON_INC_DIR") + "/templates"
             ])
@@ -91,7 +89,7 @@ class EbookMaker(object):
                 (self._cover_template.render(
                     tab="\t",
                     cover_image_fn=cover_image_fn,
-                    esc_title=escape(j['title'])) + "\n"),
+                    esc_title=j['title']) + "\n"),
                 ZIP_STORED)
         nav_points = []
         for item in j['contents']:
@@ -175,7 +173,7 @@ class EbookMaker(object):
 
         def get_nav_points(counter, nav_points, start_idx, level):
             idx = start_idx
-            ret = ''
+            ret = jinja2.Markup('')
             prefix = (INDENT_STEP * (level-1))
             while idx < len(nav_points):
                 rec = nav_points[idx]
@@ -183,7 +181,7 @@ class EbookMaker(object):
                     return ret, idx
                 href = rec['href']
                 label = rec['label']
-                counter.toc_html_text += (
+                counter.toc_html_text += jinja2.Markup(
                     '<p style="text-indent: {level}em;">' +
                     '<a href="{href}">{label}</a></p>\n' +
                     '').format(
@@ -191,7 +189,7 @@ class EbookMaker(object):
                     label=label,
                     href=href)
 
-                ret += (
+                ret += jinja2.Markup(
                     '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                     '{p}{indent}<navLabel><text>{label}</text></navLabel>\n' +
                     '{p}{indent}<content src="{href}"/>\n' +
@@ -211,16 +209,18 @@ class EbookMaker(object):
                             next_idx, next_level)
                         ret += sub_ret
                 idx = next_idx
-                ret += (
+                ret += jinja2.Markup(
                     '{p}</navPoint>\n'
                 ).format(p=prefix)
             return ret, idx
-        nav_points_text = ''
+        nav_points_text = jinja2.Markup('')
         counter = MyCounter()
         for n in nav_points:
-            counter.toc_html_text += '<div style="margin-top: 1em;">\n'
+            counter.toc_html_text += jinja2.Markup(
+                '<div style="margin-top: 1em;">\n'
+            )
             nav_points_text += get_nav_points(counter, n, 0, 1)[0]
-            counter.toc_html_text += '</div>\n'
+            counter.toc_html_text += jinja2.Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
             author_name=j['authors'][0]['name'],
             title=j['title'],
