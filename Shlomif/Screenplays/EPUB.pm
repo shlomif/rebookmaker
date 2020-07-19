@@ -66,13 +66,14 @@ eval {
     require Inline;
     Inline->import( 'Python' => <<'EOF');
 
-import shlomif_epub_maker
+from shlomif_epub_maker import EbookMaker
 import traceback
 import sys
 
-def _my_amend_epub(filename, json_filename):
+_maker = EbookMaker()
+def _my_make_epub(json_filename, filename):
     try:
-        shlomif_epub_maker._my_amend_epub(filename.decode('utf-8'), json_filename.decode('utf-8'))
+        _maker.make_epub(json_filename.decode('utf-8'), filename.decode('utf-8'), )
     except Exception as e:
         traceback.print_tb(sys.exc_info()[2])
         raise e
@@ -83,8 +84,8 @@ EOF
 
 if ($@)
 {
-    *_my_amend_epub = sub {
-        my ( $epub_fn, $json_abs ) = @_;
+    *_my_make_epub = sub {
+        my ( $json_abs, $epub_fn, ) = @_;
         my @cmd = (
             ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
             "--output", $epub_fn, $json_abs,
@@ -263,7 +264,7 @@ sub output_json
     {
         chdir($target_dir);
 
-        _my_amend_epub( $epub_fn->stringify(), $json_abs->stringify(), );
+        _my_make_epub( $json_abs->stringify(), $epub_fn->stringify(), );
 
         chdir($orig_dir);
     }
