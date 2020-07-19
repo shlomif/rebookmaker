@@ -61,15 +61,17 @@ class EbookMaker(object):
     """docstring for EbookMaker"""
     def __init__(self):
         self._env = Environment(
-            loader=FileSystemLoader([os.getenv("SCREENPLAY_COMMON_INC_DIR")])
+            loader=FileSystemLoader([
+                os.getenv("SCREENPLAY_COMMON_INC_DIR") + "/templates"
+            ])
         )
-        self._cover_template = self._env.get_template('cover-html' + '.jinja')
+        self._cover_template = self._env.get_template('cover.html' + '.jinja')
         self._container_xml_template = self._env.get_template(
-            'container-xml' + '.jinja')
+            'container.xml' + '.jinja')
         self._content_opf_template = self._env.get_template(
-            'content-opf' + '.jinja')
-        self._toc_ncx_template = self._env.get_template('toc-ncx' + '.jinja')
-        self._toc_html_template = self._env.get_template('toc-html' + '.jinja')
+            'content.opf' + '.jinja')
+        self._toc_ncx_template = self._env.get_template('toc.ncx' + '.jinja')
+        self._toc_html_template = self._env.get_template('toc.html' + '.jinja')
 
     def make_epub(self, json_fn, output_filename):
         z = ZipFile(output_filename, 'w')
