@@ -14,8 +14,6 @@ licence, which prompted this re-implementation.
 
 * https://pypi.org/project/ebookmaker/ - GPLv3 by Project Gutenberg and
 incompatible with @setanata 's .
-The black_hole_solver PyPI distribution wraps the Black Hole Solitaire
-Solver C API:
 
 INSTALLATION
 ------------
