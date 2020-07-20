@@ -205,6 +205,7 @@ class DistGenerator(object):
         self.command__build()
         check_call(["bash", "-c", self._myformat(
             "cd {dest_dir} && python3 setup.py sdist " +
+            " && twine check dist/{dist_name}*.tar.gz " +
             " && twine upload --verbose dist/{dist_name}*.tar.gz")])
 
     def command__gen_travis_yaml(self):

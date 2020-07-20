@@ -10,12 +10,12 @@ some input HTML and image files into an .epub.
 See:
 
 * https://github.com/setanta/ebookmaker/ - does not have an explicit
-licence, which prompted this re-implementation.
-
+  licence, which prompted this re-implementation.
 * https://pypi.org/project/ebookmaker/ - GPLv3 by Project Gutenberg and
-incompatible with @setanata 's .
+  incompatible with @setanata 's .
 
 INSTALLATION
 ------------
 
 pip3 install rebookmaker
+
