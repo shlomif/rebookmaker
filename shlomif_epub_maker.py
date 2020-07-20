@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup
 import jinja2
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from jinja2 import Markup
 
 INDENT_STEP = (' ' * 4)
 
@@ -58,7 +59,7 @@ class MyCounter:
     """
     def __init__(self):
         self.counter = 0
-        self.toc_html_text = jinja2.Markup('')
+        self.toc_html_text = Markup('')
 
     def get_idx(self):
         """docstring for get_idx"""
@@ -196,7 +197,7 @@ class EbookMaker:
 
         def get_nav_points(counter, nav_points, start_idx, level):
             idx = start_idx
-            ret = jinja2.Markup('')
+            ret = Markup('')
             prefix = (INDENT_STEP * (level-1))
             while idx < len(nav_points):
                 rec = nav_points[idx]
@@ -204,7 +205,7 @@ class EbookMaker:
                     return ret, idx
                 href = rec['href']
                 label = rec['label']
-                counter.toc_html_text += jinja2.Markup(
+                counter.toc_html_text += Markup(
                     '<p style="text-indent: {level}em;">' +
                     '<a href="{href}">{label}</a></p>\n' +
                     '').format(
@@ -213,7 +214,7 @@ class EbookMaker:
                         href=href
                     )
 
-                ret += jinja2.Markup(
+                ret += Markup(
                     '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                     '{p}{indent}<navLabel><text>{label}</text></navLabel>\n' +
                     '{p}{indent}<content src="{href}"/>\n' +
@@ -233,20 +234,20 @@ class EbookMaker:
                             next_idx, next_level)
                         ret += sub_ret
                 idx = next_idx
-                ret += jinja2.Markup(
+                ret += Markup(
                     '{p}</navPoint>\n'
                 ).format(p=prefix)
             return ret, idx
-        nav_points_text = jinja2.Markup('')
+        nav_points_text = Markup('')
         counter = MyCounter()
         for file_nav_points in nav_points:
-            counter.toc_html_text += jinja2.Markup(
+            counter.toc_html_text += Markup(
                 '<div style="margin-top: 1em;">\n'
             )
             nav_points_text += get_nav_points(
                 counter, file_nav_points, 0, 1
             )[0]
-            counter.toc_html_text += jinja2.Markup('</div>\n')
+            counter.toc_html_text += Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
             author_name=j['authors'][0]['name'],
             title=j['title'],
