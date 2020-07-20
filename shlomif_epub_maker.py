@@ -131,7 +131,7 @@ class EbookMaker:
             self._container_xml_template.render(), ZIP_STORED)
         zip_obj.write("style.css", "OEBPS/style.css", ZIP_STORED)
         images = sorted(list(images))
-        for img in (images + [cover_image_fn]):
+        for img in images + [cover_image_fn]:
             zip_obj.write(img, 'OEBPS/' + img)
         for html_src in htmls:
             zip_obj.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
@@ -162,7 +162,7 @@ class EbookMaker:
                 {'id': 'image' + str(idx), 'href': fn,
                  'media_type': _get_image_type(fn)}
                 for idx, fn in enumerate(images)
-                    ],
+            ],
             guide=(j['guide'] if 'guide' in j else None),
             htmls0=[
                 {'id': 'item'+str(idx), 'href': fn}
@@ -185,9 +185,10 @@ class EbookMaker:
                     '<p style="text-indent: {level}em;">' +
                     '<a href="{href}">{label}</a></p>\n' +
                     '').format(
-                    level=level,
-                    label=label,
-                    href=href)
+                        level=level,
+                        label=label,
+                        href=href
+                    )
 
                 ret += jinja2.Markup(
                     '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
