@@ -5,6 +5,22 @@
 # Copyright © 2020 Shlomi Fish <shlomif@cpan.org>
 #
 # Distributed under the MIT license.
+"""
+rebookmaker - an open source (MIT-licensed) re-implementation of
+Marcelo Lira’s ( @setanata ) ebookmaker.
+
+It converts an EPUB definition inside a JSON file along with
+some input HTML and image files into an .epub.
+
+See:
+
+* https://github.com/setanta/ebookmaker/ - does not have an explicit
+licence, which prompted this re-implementation.
+
+* https://pypi.org/project/ebookmaker/ - GPLv3 by Project Gutenberg and
+incompatible with @setanata 's .
+
+"""
 
 import json
 import os
@@ -37,6 +53,9 @@ def _get_image_type(filename):
 
 
 class MyCounter:
+    """
+    Utility class
+    """
     def __init__(self):
         self.counter = 0
         self.toc_html_text = jinja2.Markup('')
@@ -72,6 +91,10 @@ class EbookMaker:
         self._toc_html_template = self._env.get_template('toc.html' + '.jinja')
 
     def make_epub(self, json_fn, output_filename):
+        """
+        Prepare an EPUB inside output_filename from the
+        JSON file json_fn
+        """
         zip_obj = ZipFile(output_filename, 'w')
         with open(json_fn, 'rb') as file_handle:
             j = json.load(file_handle)
