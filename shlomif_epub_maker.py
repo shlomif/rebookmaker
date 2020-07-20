@@ -24,16 +24,16 @@ INDENT_STEP = (' ' * 4)
 EPUB_COVER = ''''''
 
 
-def _get_image_type(fn):
-    if fn.endswith('.jpeg'):
+def _get_image_type(filename):
+    if filename.endswith('.jpeg'):
         return 'image/jpeg'
-    if fn.endswith('.jpg'):
+    if filename.endswith('.jpg'):
         return 'image/jpeg'
-    if fn.endswith('.png'):
+    if filename.endswith('.png'):
         return 'image/png'
-    if fn.endswith('.webp'):
+    if filename.endswith('.webp'):
         return 'image/webp'
-    assert 0
+    raise IOError("unknown image extension for '{}'".format(filename))
 
 
 class MyCounter:
@@ -72,9 +72,9 @@ class EbookMaker:
         self._toc_html_template = self._env.get_template('toc.html' + '.jinja')
 
     def make_epub(self, json_fn, output_filename):
-        z = ZipFile(output_filename, 'w')
-        with open(json_fn, 'rb') as fh:
-            j = json.load(fh)
+        zip_obj = ZipFile(output_filename, 'w')
+        with open(json_fn, 'rb') as file_handle:
+            j = json.load(file_handle)
         images = set()
         cover_image_fn = j['cover']
         # images.add(cover_image_fn)
@@ -84,7 +84,7 @@ class EbookMaker:
         h_tags = tuple(h_tags)
         htmls = []
         for html_src in ['cover.html']:
-            z.writestr(
+            zip_obj.writestr(
                 'OEBPS/' + html_src,
                 (self._cover_template.render(
                     tab="\t",
@@ -105,39 +105,39 @@ class EbookMaker:
             for html_src in html_sources:
                 page_nav = []
                 htmls.append(html_src)
-                with open(html_src, 'rt') as fh:
-                    text = fh.read()
+                with open(html_src, 'rt') as file_handle:
+                    text = file_handle.read()
                 soup = BeautifulSoup(text, 'lxml')
                 for img in soup.find_all('img'):
                     src = img['src']
                     if src:
                         images.add(src)
-                for h in soup.find_all(h_tags):
-                    if h.has_attr('id'):
-                        href = html_src+"#"+h['id']
+                for h_elem in soup.find_all(h_tags):
+                    if h_elem.has_attr('id'):
+                        href = html_src+"#"+h_elem['id']
                     else:
                         href = None
                     page_nav.append(
                         {
-                            'level': int(h.name[-1]),
+                            'level': int(h_elem.name[-1]),
                             'href': href,
-                            'label': h.get_text(),
+                            'label': h_elem.get_text(),
                         }
-                        )
+                    )
                 nav_points.append(page_nav)
-        z.writestr("mimetype", "application/epub+zip", ZIP_STORED)
-        z.writestr(
+        zip_obj.writestr("mimetype", "application/epub+zip", ZIP_STORED)
+        zip_obj.writestr(
             "META-INF/container.xml",
             self._container_xml_template.render(), ZIP_STORED)
-        z.write("style.css", "OEBPS/style.css", ZIP_STORED)
+        zip_obj.write("style.css", "OEBPS/style.css", ZIP_STORED)
         images = sorted(list(images))
         for img in (images + [cover_image_fn]):
-            z.write(img, 'OEBPS/' + img)
+            zip_obj.write(img, 'OEBPS/' + img)
         for html_src in htmls:
-            z.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
+            zip_obj.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
 
         def _writestr(basefn, content_text):
-            z.writestr(
+            zip_obj.writestr(
                 "OEBPS/" + basefn,
                 RE.sub("\n", content_text),
                 ZIP_STORED
@@ -215,11 +215,13 @@ class EbookMaker:
             return ret, idx
         nav_points_text = jinja2.Markup('')
         counter = MyCounter()
-        for n in nav_points:
+        for file_nav_points in nav_points:
             counter.toc_html_text += jinja2.Markup(
                 '<div style="margin-top: 1em;">\n'
             )
-            nav_points_text += get_nav_points(counter, n, 0, 1)[0]
+            nav_points_text += get_nav_points(
+                counter, file_nav_points, 0, 1
+            )[0]
             counter.toc_html_text += jinja2.Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
             author_name=j['authors'][0]['name'],
@@ -231,4 +233,4 @@ class EbookMaker:
             toc_html_text=counter.toc_html_text,
         )
         _writestr("toc.html", content_text)
-        z.close()
+        zip_obj.close()
