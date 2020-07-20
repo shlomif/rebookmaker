@@ -65,8 +65,7 @@ has 'common_json_data' => (
 eval {
     require Inline;
     Inline->import( 'Python' => <<'EOF');
-
-from shlomif_epub_maker import EbookMaker
+from rebookmaker import EbookMaker
 import traceback
 import sys
 
