@@ -73,7 +73,8 @@ RE = re.compile("[\\n\\r]*\\Z")
 
 class EbookMaker:
     """docstring for EbookMaker"""
-    def __init__(self):
+    def __init__(self, compression=ZIP_STORED):
+        self._compression = compression
         self._env = Environment(
             autoescape=jinja2.select_autoescape(
                 disabled_extensions=('nonenone',),
@@ -97,6 +98,7 @@ class EbookMaker:
         Prepare an EPUB inside output_filename from the
         JSON file json_fn
         """
+        _compression = self._compression
         zip_obj = ZipFile(output_filename, 'w')
         with open(json_fn, 'rb') as file_handle:
             j = json.load(file_handle)
@@ -115,7 +117,7 @@ class EbookMaker:
                     tab="\t",
                     cover_image_fn=cover_image_fn,
                     esc_title=j['title']) + "\n"),
-                ZIP_STORED)
+                _compression)
         nav_points = []
         for item in j['contents']:
             if 'generate' not in item:
@@ -154,18 +156,18 @@ class EbookMaker:
         zip_obj.writestr(
             "META-INF/container.xml",
             self._container_xml_template.render(), ZIP_STORED)
-        zip_obj.write("style.css", "OEBPS/style.css", ZIP_STORED)
+        zip_obj.write("style.css", "OEBPS/style.css", _compression)
         images = sorted(list(images))
         for img in images + [cover_image_fn]:
             zip_obj.write(img, 'OEBPS/' + img)
         for html_src in htmls:
-            zip_obj.write(html_src, 'OEBPS/' + html_src, ZIP_STORED)
+            zip_obj.write(html_src, 'OEBPS/' + html_src, _compression)
 
         def _writestr(basefn, content_text):
             zip_obj.writestr(
                 "OEBPS/" + basefn,
                 RE.sub("\n", content_text),
-                ZIP_STORED
+                _compression
             )
 
         content_text = self._content_opf_template.render(
