@@ -66,10 +66,11 @@ eval {
     require Inline;
     Inline->import( 'Python' => <<'EOF');
 from rebookmaker import EbookMaker
+from zipfile import ZIP_DEFLATED
 import traceback
 import sys
 
-_maker = EbookMaker()
+_maker = EbookMaker(compression=ZIP_DEFLATED)
 def _my_make_epub(json_filename, filename):
     try:
         _maker.make_epub(json_filename.decode('utf-8'), filename.decode('utf-8'), )
