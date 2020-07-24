@@ -8,6 +8,7 @@ use Path::Tiny qw/ path /;
 
 use utf8;
 
+use App::Gezer ();
 use MooX qw/late/;
 
 use XML::LibXML               ();
@@ -137,6 +138,7 @@ sub run
     # Prepare the objects.
     my $xml       = XML::LibXML->new;
     my $root_node = $xml->parse_file($filename);
+    my @scene_bns;
     {
         my $scenes_list =
             _get_xpc($root_node)
@@ -182,10 +184,10 @@ q{//xhtml:main[@class='screenplay']/xhtml:section[@class='scene']/xhtml:section[
 q# xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"#;
                     $scene_string =~ s{(<\w+)\Q$xmlns\E( )}{$1$2}g;
 
-                    path(     $target_dir
-                            . "/scene-"
-                            . sprintf( "%.4d", ( $idx + 1 ) )
-                            . ".xhtml" )->spew_utf8(<<"EOF");
+                    my $scene_bn =
+                        "scene-" . sprintf( "%.4d", ( $idx + 1 ) ) . ".xhtml";
+                    push @scene_bns, $scene_bn;
+                    path( $target_dir . "/$scene_bn" )->spew_utf8(<<"EOF");
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE
     html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -202,7 +204,21 @@ $scene_string
 </html>
 EOF
                 }
-                $idx++;
+                ++$idx;
+            }
+        );
+    }
+    {
+        local $ENV{APPLY_TEXTS} = "1";
+        App::Gezer->new()->run(
+            {
+                ARGV => [
+                    qw#--mode=minify --minifier-conf=bin/html-min-cli-config-file.conf --texts-dir=lib/ads#,
+                    "--source-dir=$target_dir",
+                    "--dest-dir=$target_dir",
+                    "--",
+                    @scene_bns
+                ]
             }
         );
     }
