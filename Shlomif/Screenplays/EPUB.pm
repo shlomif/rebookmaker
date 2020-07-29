@@ -88,11 +88,11 @@ if ($@)
     *_my_make_epub = sub {
         my ( $json_abs, $epub_fn, ) = @_;
         my @cmd = (
-            ( $ENV{EBOOKMAKER} || "./lib/ebookmaker/ebookmaker" ),
+            ( $ENV{REBOOKMAKER} || "rebookmaker" ),
             "--output", $epub_fn, $json_abs,
         );
         system(@cmd)
-            and die "cannot run ebookmaker <<@cmd>> - $!";
+            and die "cannot run rebookmaker <<@cmd>> - $!";
         return;
     };
 }
