@@ -1,3 +1,6 @@
+0.4.0
+    Add and install the rebookmaker executable.
+
 0.2.0
     Add the compression parameter to EbookMaker.
 

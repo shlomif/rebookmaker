@@ -72,9 +72,9 @@ class DistGenerator(object):
                 "entry_point": ["none", "cli", "gui", ],
                 "project_name": "rebookmaker",
                 "project_short_description": "EPUB generator",
-                "release_date": "2020-07-24",
+                "release_date": "2020-07-29",
                 "repo_name": self.dist_name,
-                "version": "0.2.0",
+                "version": "0.4.0",
                 "year": "2020",
                 'aur_email': "shlomif@cpan.org",
                 'email': "shlomif@cpan.org",
@@ -149,12 +149,15 @@ class DistGenerator(object):
             _re_mutate2(
                 fn, "include_package_data=True,",
                 prefix="include_package_data=True,\n    " +
-                "package_data={'': ['data/templates/*.jinja']},")
+                "package_data={'': ['data/templates/*.jinja']}," +
+                "\n    scripts=['rebookmaker/rebookmaker'],"
+                )
 
         req_bn = "requirements.txt"
         req_fn = "{src_dir}/" + req_bn
         dest_req_fn = "{dest_dir}/" + req_bn
         _dest_append(req_bn)
+        _dest_append("MANIFEST.in")
         for fn in glob.glob("code/rebookmaker/data/templates/*.jinja"):
             _dest_append(fn[5:])
 
@@ -189,6 +192,7 @@ class DistGenerator(object):
         _reqs_mutate(dest_req_fn)
 
         _dest_append("tests/test_rebook.py", make_exe=True)
+        _dest_append("rebookmaker/rebookmaker", make_exe=True)
         with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
             ofh.write(
                 "[tox]\nenvlist = py38\n\n" +
@@ -200,6 +204,12 @@ class DistGenerator(object):
     def command__test(self):
         check_call(["bash", "-c",
                     self._myformat("cd {dest_dir} && {tox_cmd}")])
+
+    def command__install(self):
+        self.command__build()
+        check_call(["bash", "-c", self._myformat(
+            "cd {dest_dir} && pip install --user --upgrade ."
+        )])
 
     def command__release(self):
         self.command__build()
@@ -245,6 +255,8 @@ class DistGenerator(object):
             obj.command__build()
         elif cmd == 'build_only':
             obj.command__build_only()
+        elif cmd == 'install':
+            obj.command__install()
         elif cmd == 'release':
             obj.command__release()
         elif cmd == 'test':
