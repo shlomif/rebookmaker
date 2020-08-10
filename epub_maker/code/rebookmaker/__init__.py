@@ -98,15 +98,22 @@ class EbookMaker:
         Prepare an EPUB inside output_filename from the
         JSON file json_fn
         """
+        with open(json_fn, 'rb') as file_handle:
+            json_data = json.load(file_handle)
+        return self.make_epub_from_data(json_data, output_filename)
+
+    def make_epub_from_data(self, json_data, output_filename):
+        """
+        Prepare an EPUB inside output_filename from the
+        raw JSON-like data json_data.
+        """
         _compression = self._compression
         zip_obj = ZipFile(output_filename, 'w')
-        with open(json_fn, 'rb') as file_handle:
-            j = json.load(file_handle)
         images = set()
-        cover_image_fn = j['cover']
+        cover_image_fn = json_data['cover']
         # images.add(cover_image_fn)
         h_tags = []
-        for i in range(1, min(6, j['toc']['depth'])+1):
+        for i in range(1, min(6, json_data['toc']['depth'])+1):
             h_tags.append("h"+str(i))
         h_tags = tuple(h_tags)
         htmls = []
@@ -116,10 +123,10 @@ class EbookMaker:
                 (self._cover_template.render(
                     tab="\t",
                     cover_image_fn=cover_image_fn,
-                    esc_title=j['title']) + "\n"),
+                    esc_title=json_data['title']) + "\n"),
                 _compression)
         nav_points = []
-        for item in j['contents']:
+        for item in json_data['contents']:
             if 'generate' not in item:
                 item['generate'] = (item['type'] == 'toc')
             if item['generate']:
@@ -171,13 +178,13 @@ class EbookMaker:
             )
 
         content_text = self._content_opf_template.render(
-            author_sorted=j['authors'][0]['sort'],
-            author_name=j['authors'][0]['name'],
-            dc_rights=j['rights'],
-            language=j['language'],
-            publisher=j['publisher'],
-            title=j['title'],
-            url=j['identifier']['value'],
+            author_sorted=json_data['authors'][0]['sort'],
+            author_name=json_data['authors'][0]['name'],
+            dc_rights=json_data['rights'],
+            language=json_data['language'],
+            publisher=json_data['publisher'],
+            title=json_data['title'],
+            url=json_data['identifier']['value'],
             images0=[
                 {
                     'id': 'coverimage',
@@ -190,7 +197,7 @@ class EbookMaker:
                  'media_type': _get_image_type(fn)}
                 for idx, fn in enumerate(images)
             ],
-            guide=(j['guide'] if 'guide' in j else None),
+            guide=(json_data['guide'] if 'guide' in json_data else None),
             htmls0=[
                 {'id': 'item'+str(idx), 'href': fn}
                 for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)
@@ -252,8 +259,8 @@ class EbookMaker:
             )[0]
             counter.toc_html_text += Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
-            author_name=j['authors'][0]['name'],
-            title=j['title'],
+            author_name=json_data['authors'][0]['name'],
+            title=json_data['title'],
             navPoints_text=nav_points_text
         )
         _writestr("toc.ncx", content_text)
