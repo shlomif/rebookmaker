@@ -1,9 +1,14 @@
 =encoding utf8
 
-=head1 Shlomif's Screenplay-XML and Fiction-XML Common files.
+=head1 rebookmaker
 
-These are common files for the Shlomi Fish’s homepage build system for:
+An EPUB generator.
 
-L<http://www.shlomifish.org/open-source/projects/XML-Grammar/Fiction/> .
+An MIT-licensed rewrite of L<@setanta's ebookmaker|https://github.com/setanta/ebookmaker/>
+(which has no explicit licence).
+
+=head1 INSTALLATION
+
+See L<https://pypi.org/project/rebookmaker/> .
 
 =cut
