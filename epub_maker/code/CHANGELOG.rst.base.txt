@@ -1,3 +1,8 @@
+0.6.0
+    Set up a GitHub repo at https://pypi.org/project/rebookmaker/
+
+    Add make_epub_from_data().
+
 0.4.0
     Add and install the rebookmaker executable.
 

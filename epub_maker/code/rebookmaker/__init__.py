@@ -106,6 +106,8 @@ class EbookMaker:
         """
         Prepare an EPUB inside output_filename from the
         raw JSON-like data json_data.
+
+        (Added at version 0.6.0 .)
         """
         _compression = self._compression
         zip_obj = ZipFile(output_filename, 'w')
