@@ -1,2 +1,5 @@
 bs4
+jinja2
 lxml
+pytest
+pytest-cov

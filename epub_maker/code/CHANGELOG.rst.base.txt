@@ -1,3 +1,7 @@
+0.8.0
+    Improve the documentation: add links and explanations.
+    Correct the spelling of the github username of "setanta".
+
 0.6.0
     Set up a GitHub repo at https://pypi.org/project/rebookmaker/
 
