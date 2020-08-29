@@ -49,8 +49,9 @@ Similar Projects:
 
 * http://docbook.sourceforge.net/release/xsl/current/epub/README - DocBook 5 can be
   converted to EPUB.
-  * https://github.com/shlomif/cookiecutter--shlomif-latemp-sites - contains some custom XSLT
+* https://github.com/shlomif/cookiecutter--shlomif-latemp-sites - contains some custom XSLT
   stylesheets for reproducible builds and other features.
 * https://pypi.org/project/ebookmaker/ - by Project Gutenberg: accepts a different input.
 * https://packages.debian.org/source/sid/strip-nondeterminism - allow for reproducible
   builds EPUBs.
+
