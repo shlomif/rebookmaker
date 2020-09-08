@@ -20,7 +20,10 @@ import cookiecutter.main
 
 class DistGenerator(object):
     """docstring for DistGenerator"""
-    def __init__(self, dist_name, base_dir=None):
+    def __init__(self, dist_name, base_dir=None, dist_version=None):
+        if not dist_version:
+            raise Exception("dist_version must be specified.")
+        self.dist_version = dist_version
         self.dist_name = dist_name
         self.base_dir = (base_dir or ("python-" + dist_name))
         self.src_dir = "code"
@@ -74,7 +77,7 @@ class DistGenerator(object):
                 "project_short_description": "EPUB generator",
                 "release_date": "2020-08-29",
                 "repo_name": self.dist_name,
-                "version": "0.8.0",
+                "version": self.dist_version,
                 "year": "2020",
                 'aur_email': "shlomif@cpan.org",
                 'email': "shlomif@cpan.org",
@@ -272,5 +275,8 @@ except IndexError:
 
 dist_name = "rebookmaker"
 
-obj = DistGenerator(dist_name=dist_name)
+obj = DistGenerator(
+    dist_name=dist_name,
+    dist_version="0.8.0",
+)
 obj.run_command(cmd=cmd, args=[])
