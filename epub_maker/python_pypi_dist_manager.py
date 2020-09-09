@@ -106,11 +106,9 @@ class DistGenerator(object):
         prefix = self.src_dir + "/"
         glob_expr = prefix + proto_expr
         prefix_len = len(prefix)
-        ret = []
         for fn in glob.glob(glob_expr):
             assert fn.startswith(prefix)
-            self._dest_append(fn[prefix_len:])
-        return ret
+            yield fn[prefix_len:]
 
     def command__build_only(self):
         self._fmt_rmtree("{dest_dir}")
