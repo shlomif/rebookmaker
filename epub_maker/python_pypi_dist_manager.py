@@ -64,6 +64,14 @@ class DistGenerator(object):
         self.command__build_only()
         self.command__test()
 
+    def _append(self, to_proto, from_, make_exe=False):
+        to = self._myformat(to_proto)
+        os.makedirs(os.path.dirname(to), exist_ok=True)
+        with open(to, "at") as ofh:
+            ofh.write(self._fmt_slurp(from_))
+        if make_exe:
+            os.chmod(to, 0o755)
+
     def command__build_only(self):
         self._fmt_rmtree("{dest_dir}")
         self._fmt_rmtree("{dist_name}")
@@ -87,23 +95,16 @@ class DistGenerator(object):
             )
         os.rename(self.dist_name, self.dest_dir)
 
-        def _append(to_proto, from_, make_exe=False):
-            to = self._myformat(to_proto)
-            os.makedirs(os.path.dirname(to), exist_ok=True)
-            with open(to, "at") as ofh:
-                ofh.write(self._fmt_slurp(from_))
-            if make_exe:
-                os.chmod(to, 0o755)
-
         def _dest_append(bn_proto, make_exe=False):
-            return _append(
+            return self._append(
                 "{dest_dir}/"+bn_proto,
                 "{src_dir}/"+bn_proto,
                 make_exe
             )
 
-        _append("{dest_modules_dir}/__init__.py",
-                "{src_modules_dir}/__init__.py")
+        self._append(
+            "{dest_modules_dir}/__init__.py",
+            "{src_modules_dir}/__init__.py")
 
         def _re_mutate(fn_proto, pattern, repl_fn_proto, prefix='', suffix=''):
             fn = self._myformat(fn_proto)
