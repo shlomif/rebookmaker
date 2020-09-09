@@ -15,21 +15,20 @@ import shutil
 import sys
 from subprocess import check_call
 
+import attr
 import cookiecutter.main
 
 
+@attr.s
 class DistGenerator(object):
+    dist_name = attr.ib()
+    dist_version = attr.ib()
+    project_name = attr.ib()
+
     """docstring for DistGenerator"""
-    def __init__(self, dist_name, base_dir=None, dist_version=None,
-                 project_name=None):
-        if not dist_version:
-            raise Exception("dist_version must be specified.")
-        self.dist_version = dist_version
-        if not project_name:
-            raise Exception("project_name must be specified.")
-        self.project_name = project_name
-        self.dist_name = dist_name
-        self.base_dir = (base_dir or ("python-" + dist_name))
+    def __attrs_post_init__(self):
+        dist_name = self.dist_name
+        self.base_dir = ("python-" + dist_name)
         self.src_dir = "code"
         self.src_modules_dir = self.src_dir + "/" + dist_name
         self.dest_dir = 'dest'
