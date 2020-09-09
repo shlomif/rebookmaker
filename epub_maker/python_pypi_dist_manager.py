@@ -24,6 +24,7 @@ class DistGenerator(object):
     dist_name = attr.ib()
     dist_version = attr.ib()
     project_name = attr.ib()
+    project_short_description = attr.ib()
 
     """docstring for DistGenerator"""
     def __attrs_post_init__(self):
@@ -111,7 +112,7 @@ class DistGenerator(object):
             extra_context={
                 "entry_point": ["none", "cli", "gui", ],
                 "project_name": self.project_name,
-                "project_short_description": "EPUB generator",
+                "project_short_description": self.project_short_description,
                 "release_date": "2020-08-29",
                 "repo_name": self.dist_name,
                 "version": self.dist_version,
@@ -285,5 +286,6 @@ obj = DistGenerator(
     dist_name=dist_name,
     dist_version="0.8.0",
     project_name="rebookmaker",
+    project_short_description="EPUB generator",
 )
 obj.run_command(cmd=cmd, args=[])
