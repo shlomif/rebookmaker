@@ -72,6 +72,13 @@ class DistGenerator(object):
         if make_exe:
             os.chmod(to, 0o755)
 
+    def _dest_append(self, bn_proto, make_exe=False):
+        return self._append(
+            "{dest_dir}/"+bn_proto,
+            "{src_dir}/"+bn_proto,
+            make_exe
+        )
+
     def command__build_only(self):
         self._fmt_rmtree("{dest_dir}")
         self._fmt_rmtree("{dist_name}")
@@ -94,13 +101,6 @@ class DistGenerator(object):
                 },
             )
         os.rename(self.dist_name, self.dest_dir)
-
-        def _dest_append(bn_proto, make_exe=False):
-            return self._append(
-                "{dest_dir}/"+bn_proto,
-                "{src_dir}/"+bn_proto,
-                make_exe
-            )
 
         self._append(
             "{dest_modules_dir}/__init__.py",
@@ -160,10 +160,10 @@ class DistGenerator(object):
         req_bn = "requirements.txt"
         req_fn = "{src_dir}/" + req_bn
         dest_req_fn = "{dest_dir}/" + req_bn
-        _dest_append(req_bn)
-        _dest_append("MANIFEST.in")
+        self._dest_append(req_bn)
+        self._dest_append("MANIFEST.in")
         for fn in glob.glob("code/rebookmaker/data/templates/*.jinja"):
-            _dest_append(fn[5:])
+            self._dest_append(fn[5:])
 
         def _reqs_mutate(fn_proto):
             fn = self._myformat(fn_proto)
@@ -195,8 +195,8 @@ class DistGenerator(object):
                 ofh.write(txt)
         _reqs_mutate(dest_req_fn)
 
-        _dest_append("tests/test_rebook.py", make_exe=True)
-        _dest_append("rebookmaker/rebookmaker", make_exe=True)
+        self._dest_append("tests/test_rebook.py", make_exe=True)
+        self._dest_append("rebookmaker/rebookmaker", make_exe=True)
         with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
             ofh.write(
                 "[tox]\nenvlist = py38\n\n" +
