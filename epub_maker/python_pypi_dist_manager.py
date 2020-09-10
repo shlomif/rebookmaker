@@ -83,12 +83,13 @@ class DistGenerator(object):
             make_exe
         )
 
-    def _re_mutate(self, fn_proto, pattern, repl_fn_proto,
+    def _re_mutate(self, fn_proto, pattern, repl_fn_proto=None,
                    prefix='', suffix=''):
         fn = self._myformat(fn_proto)
         replacement_string = \
             (prefix +
-             self._fmt_slurp(repl_fn_proto) +
+             ('' if repl_fn_proto is None else
+              self._fmt_slurp(repl_fn_proto)) +
              suffix)
         txt = self._slurp(fn)
         txt, count = re.subn(
@@ -166,23 +167,6 @@ class DistGenerator(object):
             "{dest_modules_dir}/__init__.py",
             "{src_modules_dir}/__init__.py")
 
-        def _re_mutate2(fn_proto, pattern, prefix='', suffix=''):
-            fn = self._myformat(fn_proto)
-            replacement_string = \
-                (prefix +
-                 suffix)
-            txt = self._slurp(fn)
-            txt, count = re.subn(
-                pattern,
-                replacement_string.replace('\\', '\\\\'),
-                txt,
-                1,
-                re.M | re.S
-            )
-            assert count == 1
-            with open(fn, "wt") as ofh:
-                ofh.write(txt)
-
         self._re_mutate(
             "{dest_dir}/CHANGELOG.rst",
             "\n0\\.1\\.0\n.*",
@@ -193,11 +177,12 @@ class DistGenerator(object):
             self._re_mutate(
                 fn, "^PURPOSE\n.*?\n" + s, "{src_dir}/README.part.rst", '', s)
         for fn in ["{dest_dir}/setup.py", ]:
-            _re_mutate2(
+            self._re_mutate(
                 fn, "include_package_data=True,",
                 prefix="include_package_data=True,\n    " +
                 "package_data={'': ['data/templates/*.jinja']}," +
-                "\n    scripts=['rebookmaker/rebookmaker'],"
+                "\n    scripts=['rebookmaker/rebookmaker'],",
+                repl_fn_proto=None,
                 )
 
         req_bn = "requirements.txt"
