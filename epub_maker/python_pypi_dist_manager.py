@@ -110,6 +110,35 @@ class DistGenerator(object):
             assert fn.startswith(prefix)
             yield fn[prefix_len:]
 
+    def _reqs_mutate(self, fn_proto):
+        fn = self._myformat(fn_proto)
+        txt = self._slurp(fn)
+        d = {}
+        for line in txt.split("\n"):
+            if 0 == len(line):
+                continue
+            m = re.match("\\A([A-Za-z0-9_\\-]+)>=([0-9\\.]+)\\Z", line)
+            if m:
+                req = m.group(1)
+                ver = m.group(2)
+            else:
+                req = line
+                ver = '0'
+            if ver == '0':
+                if req not in d:
+                    d[req] = '0'
+            else:
+                if req not in d or d[req] == '0':
+                    d[req] = ver
+                else:
+                    raise BaseException(
+                        "mismatch reqs: {} {} {}".format(req, ver, d[req]))
+        txt = "".join(sorted([
+            x + ('' if v == '0' else '>='+v) + "\n"
+            for x, v in d.items()]))
+        with open(fn, "wt") as ofh:
+            ofh.write(txt)
+
     def command__build_only(self):
         self._fmt_rmtree("{dest_dir}")
         self._fmt_rmtree("{dist_name}")
@@ -179,35 +208,7 @@ class DistGenerator(object):
         for fn in self._src_glob("rebookmaker/data/templates/*.jinja"):
             self._dest_append(fn)
 
-        def _reqs_mutate(fn_proto):
-            fn = self._myformat(fn_proto)
-            txt = self._slurp(fn)
-            d = {}
-            for line in txt.split("\n"):
-                if 0 == len(line):
-                    continue
-                m = re.match("\\A([A-Za-z0-9_\\-]+)>=([0-9\\.]+)\\Z", line)
-                if m:
-                    req = m.group(1)
-                    ver = m.group(2)
-                else:
-                    req = line
-                    ver = '0'
-                if ver == '0':
-                    if req not in d:
-                        d[req] = '0'
-                else:
-                    if req not in d or d[req] == '0':
-                        d[req] = ver
-                    else:
-                        raise BaseException(
-                            "mismatch reqs: {} {} {}".format(req, ver, d[req]))
-            txt = "".join(sorted([
-                x + ('' if v == '0' else '>='+v) + "\n"
-                for x, v in d.items()]))
-            with open(fn, "wt") as ofh:
-                ofh.write(txt)
-        _reqs_mutate(dest_req_fn)
+        self._reqs_mutate(dest_req_fn)
 
         for fn in self._src_glob("tests/test*.py"):
             self._dest_append(fn, make_exe=True)
