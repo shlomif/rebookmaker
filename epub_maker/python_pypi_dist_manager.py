@@ -26,6 +26,11 @@ class DistGenerator(object):
     project_name = attr.ib()
     project_short_description = attr.ib()
     release_date = attr.ib()
+    project_year = attr.ib()
+    aur_email = attr.ib()
+    project_email = attr.ib()
+    full_name = attr.ib()
+    github_username = attr.ib()
 
     """docstring for DistGenerator"""
     def __attrs_post_init__(self):
@@ -155,11 +160,11 @@ class DistGenerator(object):
                 "release_date": self.release_date,
                 "repo_name": self.dist_name,
                 "version": self.dist_version,
-                "year": "2020",
-                'aur_email': "shlomif@cpan.org",
-                'email': "shlomif@cpan.org",
-                'full_name': 'Shlomi Fish',
-                'github_username': "shlomif",
+                "year": self.project_year,
+                "aur_email": self.aur_email,
+                "email": self.project_email,
+                "name": self.full_name,
+                "github_username": self.github_username,
                 },
             )
         os.rename(self.dist_name, self.dest_dir)
@@ -284,5 +289,10 @@ obj = DistGenerator(
     project_name="rebookmaker",
     project_short_description="EPUB generator",
     release_date="2020-08-29",
+    project_year="2020",
+    aur_email="shlomif@cpan.org",
+    project_email="shlomif@cpan.org",
+    full_name="Shlomi Fish",
+    github_username="shlomif",
 )
 obj.run_command(cmd=cmd, args=[])
