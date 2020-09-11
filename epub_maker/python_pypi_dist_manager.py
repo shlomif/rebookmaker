@@ -187,6 +187,27 @@ class DistGenerator(object):
                 prefix='',
                 suffix=s,
             )
+
+        req_bn = "requirements.txt"
+        req_fn = "{src_dir}/" + req_bn
+        dest_req_fn = "{dest_dir}/" + req_bn
+        self._dest_append(req_bn)
+
+        self._reqs_mutate(dest_req_fn)
+
+        for fn in self._src_glob("tests/test*.py"):
+            self._dest_append(fn, make_exe=True)
+        with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
+            ofh.write(
+                "[tox]\nenvlist = py38\n\n" +
+                "[testenv]\ndeps =" + "".join(
+                    ["\n\t" + x for x in
+                     self._fmt_slurp(req_fn).split("\n")]) + "\n" +
+                "\ncommands = pytest\n")
+        self._build_only_command_custom_steps()
+
+    def _build_only_command_custom_steps(self):
+        self._dest_append("rebookmaker/rebookmaker", make_exe=True)
         for fn in ["{dest_dir}/setup.py", ]:
             self._re_mutate(
                 fn_proto=fn,
@@ -196,27 +217,9 @@ class DistGenerator(object):
                 "package_data={'': ['data/templates/*.jinja']}," +
                 "\n    scripts=['rebookmaker/rebookmaker'],",
                 )
-
-        req_bn = "requirements.txt"
-        req_fn = "{src_dir}/" + req_bn
-        dest_req_fn = "{dest_dir}/" + req_bn
-        self._dest_append(req_bn)
         self._dest_append("MANIFEST.in")
         for fn in self._src_glob("rebookmaker/data/templates/*.jinja"):
             self._dest_append(fn)
-
-        self._reqs_mutate(dest_req_fn)
-
-        for fn in self._src_glob("tests/test*.py"):
-            self._dest_append(fn, make_exe=True)
-        self._dest_append("rebookmaker/rebookmaker", make_exe=True)
-        with open(self._myformat("{dest_dir}/tox.ini"), "wt") as ofh:
-            ofh.write(
-                "[tox]\nenvlist = py38\n\n" +
-                "[testenv]\ndeps =" + "".join(
-                    ["\n\t" + x for x in
-                     self._fmt_slurp(req_fn).split("\n")]) + "\n" +
-                "\ncommands = pytest\n")
 
     def command__test(self):
         check_call(["bash", "-c",
