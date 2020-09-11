@@ -174,21 +174,28 @@ class DistGenerator(object):
             "{src_modules_dir}/__init__.py")
 
         self._re_mutate(
-            "{dest_dir}/CHANGELOG.rst",
-            "\n0\\.1\\.0\n.*",
-            "{src_dir}/CHANGELOG.rst.base.txt", "\n")
+            fn_proto="{dest_dir}/CHANGELOG.rst",
+            pattern="\n0\\.1\\.0\n.*",
+            repl_fn_proto="{src_dir}/CHANGELOG.rst.base.txt",
+            prefix="\n")
         s = "COPYRIGHT\n"
         for fn in ["{dest_dir}/README", "{dest_dir}/README.rst",
                    "{dest_dir}/docs/README.rst", ]:
             self._re_mutate(
-                fn, "^PURPOSE\n.*?\n" + s, "{src_dir}/README.part.rst", '', s)
+                fn_proto=fn,
+                pattern=("^PURPOSE\n.*?\n" + s),
+                repl_fn_proto="{src_dir}/README.part.rst",
+                prefix='',
+                suffix=s,
+            )
         for fn in ["{dest_dir}/setup.py", ]:
             self._re_mutate(
-                fn, "include_package_data=True,",
+                fn_proto=fn,
+                pattern="include_package_data=True,",
+                repl_fn_proto=None,
                 prefix="include_package_data=True,\n    " +
                 "package_data={'': ['data/templates/*.jinja']}," +
                 "\n    scripts=['rebookmaker/rebookmaker'],",
-                repl_fn_proto=None,
                 )
 
         req_bn = "requirements.txt"
