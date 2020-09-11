@@ -169,9 +169,8 @@ class DistGenerator(object):
             )
         os.rename(self.dist_name, self.dest_dir)
 
-        self._append(
-            "{dest_modules_dir}/__init__.py",
-            "{src_modules_dir}/__init__.py")
+        for fn in self._src_glob(self._myformat("{dist_name}/*.py")):
+            self._dest_append(fn)
 
         self._re_mutate(
             fn_proto="{dest_dir}/CHANGELOG.rst",
