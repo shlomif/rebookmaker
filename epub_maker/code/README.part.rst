@@ -57,3 +57,4 @@ Similar Projects:
 * https://pypi.org/project/ebookmaker/ - by Project Gutenberg: accepts a different input.
 * https://packages.debian.org/source/sid/strip-nondeterminism - allow for reproducible
   builds EPUBs.
+
