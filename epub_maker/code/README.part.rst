@@ -4,8 +4,11 @@ PURPOSE
 rebookmaker - an open source (MIT-licensed) re-implementation of
 Marcelo Lira’s ( @setanta ) ebookmaker.
 
-It converts an EPUB definition inside a JSON file along with
-some input HTML and image files into an .epub.
+EPUB is a popular and open file format standard for electronic books (see
+https://en.wikipedia.org/wiki/EPUB for more information about it). What
+rebookmaker (= "re-ebook-maker") does is compile a definition of the
+book inside a JSON file along with some input HTML and image files into an
+.epub.
 
 See:
 
@@ -22,7 +25,7 @@ pip3 install rebookmaker
 NOTES
 -----
 
-Since "ebookmaker" was taken on pypi and it is common courtesy to
+Since the name "ebookmaker" was taken on pypi and it is common courtesy to
 change the name, I picked "rebookmaker" since it was available
 on pypi and as a pun on `reboots in fiction <https://en.wikipedia.org/wiki/Reboot_%28fiction%29>`
 because it was a rewrite.
@@ -54,4 +57,3 @@ Similar Projects:
 * https://pypi.org/project/ebookmaker/ - by Project Gutenberg: accepts a different input.
 * https://packages.debian.org/source/sid/strip-nondeterminism - allow for reproducible
   builds EPUBs.
-

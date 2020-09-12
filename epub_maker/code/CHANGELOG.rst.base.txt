@@ -1,3 +1,9 @@
+0.8.1
+    Clarified the description of the project.
+
+    Convert the build system to https://pypi.org/project/pydistman/
+    which was extracted from the code of this and other projects.
+
 0.8.0
     Improve the documentation: add links and explanations.
     Correct the spelling of the github username of "setanta".
