@@ -24,7 +24,7 @@ NOTES
 
 Since "ebookmaker" was taken on pypi and it is common courtesy to
 change the name, I picked "rebookmaker" since it was available
-on pypi and as a pun on `reboots in fiction <https://en.wikipedia.org/wiki/Reboot_%28fiction%29>`
+on pypi and as a pun on `reboots in fiction <https://en.wikipedia.org/wiki/Reboot_%28fiction%29>`_
 because it was a rewrite.
 
 The issue where I requested an explicit licensing of the original
