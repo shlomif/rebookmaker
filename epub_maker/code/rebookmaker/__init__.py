@@ -182,6 +182,7 @@ class EbookMaker:
                 RE.sub("\n", content_text),
                 _compression
             )
+        uid_url = json_data['identifier']['value']
 
         content_text = self._content_opf_template.render(
             author_sorted=json_data['authors'][0]['sort'],
@@ -190,7 +191,7 @@ class EbookMaker:
             language=json_data['language'],
             publisher=json_data['publisher'],
             title=json_data['title'],
-            url=json_data['identifier']['value'],
+            url=uid_url,
             images0=[
                 {
                     'id': 'coverimage',
@@ -266,8 +267,9 @@ class EbookMaker:
             counter.toc_html_text += Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
             author_name=json_data['authors'][0]['name'],
+            navPoints_text=nav_points_text,
             title=json_data['title'],
-            navPoints_text=nav_points_text
+            url=uid_url,
         )
         _writestr("toc.ncx", content_text)
         content_text = self._toc_html_template.render(
