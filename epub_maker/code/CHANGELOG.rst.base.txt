@@ -1,3 +1,7 @@
+0.8.3
+    Place the mimetype file first in the ZipFile to
+    fix EPUB validation.
+
 0.8.2
     Fix a broken link in the README.
 

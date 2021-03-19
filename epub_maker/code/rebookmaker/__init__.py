@@ -110,7 +110,12 @@ class EbookMaker:
         (Added at version 0.6.0 .)
         """
         _compression = self._compression
+
+        def _write_mimetype_file_first(zip_obj):
+            """docstring for _write_mimetype_file_first"""
+            zip_obj.writestr("mimetype", "application/epub+zip", ZIP_STORED)
         zip_obj = ZipFile(output_filename, 'w')
+        _write_mimetype_file_first(zip_obj)
         images = set()
         cover_image_fn = json_data['cover']
         # images.add(cover_image_fn)
@@ -161,7 +166,6 @@ class EbookMaker:
                         }
                     )
                 nav_points.append(page_nav)
-        zip_obj.writestr("mimetype", "application/epub+zip", ZIP_STORED)
         zip_obj.writestr(
             "META-INF/container.xml",
             self._container_xml_template.render(), ZIP_STORED)
