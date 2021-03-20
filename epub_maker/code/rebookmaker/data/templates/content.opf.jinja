@@ -4,9 +4,11 @@
 
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title>{{ title }}</dc:title>
-    <dc:creator opf:file-as="{{ author_sorted }}"  opf:role="aut">{{ author_name }}</dc:creator>
+    <dc:creator id="creator1">{{ author_name }}</dc:creator>
+    <meta refines="#creator1" property="role" scheme="marc:relators" id="role">aut</meta>
+    <meta refines="#creator1" property="file-as">{{ author_sorted }}</meta>
     <dc:rights>{{ dc_rights }}</dc:rights>
-    <dc:identifier id="bookId" opf:scheme="URL">{{ url }}</dc:identifier>
+    <dc:identifier id="bookId">{{ url }}</dc:identifier>
     <dc:publisher>{{ publisher }}</dc:publisher>
     <dc:language>{{ language }}</dc:language>
     <meta name="cover" content="coverimage" />
