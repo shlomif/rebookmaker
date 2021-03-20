@@ -124,7 +124,7 @@ class EbookMaker:
             h_tags.append("h"+str(i))
         h_tags = tuple(h_tags)
         htmls = []
-        for html_src in ['cover.html']:
+        for html_src in ['cover.xhtml']:
             zip_obj.writestr(
                 'OEBPS/' + html_src,
                 (self._cover_template.render(
@@ -207,7 +207,9 @@ class EbookMaker:
             guide=(json_data['guide'] if 'guide' in json_data else None),
             htmls0=[
                 {'id': 'item'+str(idx), 'href': fn}
-                for idx, fn in enumerate(['cover.html', 'toc.html', ] + htmls)
+                for idx, fn in enumerate(
+                    ['cover.xhtml', 'toc.xhtml', ] + htmls
+                )
                 ],
         )
         _writestr("content.opf", content_text)
@@ -275,5 +277,5 @@ class EbookMaker:
         content_text = self._toc_html_template.render(
             toc_html_text=counter.toc_html_text,
         )
-        _writestr("toc.html", content_text)
+        _writestr("toc.xhtml", content_text)
         zip_obj.close()
