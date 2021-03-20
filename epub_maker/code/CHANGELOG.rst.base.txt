@@ -1,3 +1,6 @@
+0.8.4
+    More validation fixes.
+
 0.8.3
     Place the mimetype file first in the ZipFile to
     fix EPUB validation.
