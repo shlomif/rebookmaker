@@ -187,6 +187,9 @@ class EbookMaker:
         content_text = self._content_opf_template.render(
             author_sorted=json_data['authors'][0]['sort'],
             author_name=json_data['authors'][0]['name'],
+            modified_date=(
+                json_data['modified_date']
+                if ('modified_date' in json_data) else "2021-01-01T00:00:01Z"),
             dc_rights=json_data['rights'],
             language=json_data['language'],
             publisher=json_data['publisher'],

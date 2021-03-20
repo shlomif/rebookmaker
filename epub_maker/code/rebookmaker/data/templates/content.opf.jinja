@@ -5,6 +5,7 @@
 <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
     <dc:title>{{ title }}</dc:title>
     <dc:creator id="creator1">{{ author_name }}</dc:creator>
+    <meta property="dcterms:modified">{{ modified_date }}</meta>
     <meta refines="#creator1" property="role" scheme="marc:relators" id="role">aut</meta>
     <meta refines="#creator1" property="file-as">{{ author_sorted }}</meta>
     <dc:rights>{{ dc_rights }}</dc:rights>
@@ -19,7 +20,7 @@
 {% endfor %}
 {% for img in images1 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
 {% endfor %}
-    <item id="toc" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
+    <item id="toc" media-type="application/x-dtbncx+xml" properties="nav" href="toc.ncx"/>
 
 {% for item in htmls0 %}    <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
 {% endfor %}

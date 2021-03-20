@@ -2,7 +2,9 @@
     Place the mimetype file first in the ZipFile to
     fix EPUB validation.
 
-    Mor validation fixes.
+    More validation fixes.
+
+    Generate EPUB 3.2 (for XHTML5 compatibility).
 
 0.8.2
     Fix a broken link in the README.
