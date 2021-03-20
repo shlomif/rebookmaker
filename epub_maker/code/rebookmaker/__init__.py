@@ -240,6 +240,7 @@ class EbookMaker:
                         href=href
                     )
 
+                temp_ret_idx = counter.get_idx()
                 ret += Markup(
                     '{p}<navPoint id="nav{idx}" playOrder="{idx}">\n' +
                     '{p}{indent}<navLabel><text>{label}</text></navLabel>\n' +
@@ -249,7 +250,7 @@ class EbookMaker:
                     p=prefix,
                     indent=INDENT_STEP,
                     label=label,
-                    href=href, idx=counter.get_idx())
+                    href=href, idx=temp_ret_idx)
                 ret_xhtml += Markup(
                     '{p}<li>\n' +
                     '{p}<a href="{href}">{label}</a>\n' +
@@ -258,7 +259,7 @@ class EbookMaker:
                     p=prefix,
                     indent=INDENT_STEP,
                     label=label,
-                    href=href, idx=counter.get_idx())
+                    href=href, idx=temp_ret_idx)
                 next_idx = idx + 1
                 if next_idx < len(nav_points):
                     next_level = nav_points[next_idx]['level']
