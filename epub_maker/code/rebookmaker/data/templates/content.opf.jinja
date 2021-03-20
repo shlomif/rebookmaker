@@ -20,7 +20,8 @@
 {% endfor %}
 {% for img in images1 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
 {% endfor %}
-    <item id="toc" media-type="application/x-dtbncx+xml" properties="nav" href="toc.ncx"/>
+<item id="nav" media-type="application/xhtml+xml" properties="nav" href="nav.xhtml"/>
+<item id="ncx" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
 
 {% for item in htmls0 %}    <item id="{{ item.id }}" media-type="application/xhtml+xml" href="{{ item.href }}"/>
 {% endfor %}

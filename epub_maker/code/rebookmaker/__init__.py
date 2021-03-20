@@ -92,6 +92,9 @@ class EbookMaker:
             'content.opf' + '.jinja')
         self._toc_ncx_template = self._env.get_template('toc.ncx' + '.jinja')
         self._toc_html_template = self._env.get_template('toc.html' + '.jinja')
+        self._nav_xhtml_template = self._env.get_template(
+            'nav.html' + '.jinja'
+        )
 
     def make_epub(self, json_fn, output_filename):
         """
@@ -220,6 +223,7 @@ class EbookMaker:
         def get_nav_points(counter, nav_points, start_idx, level):
             idx = start_idx
             ret = Markup('')
+            ret_xhtml = Markup('')
             prefix = (INDENT_STEP * (level-1))
             while idx < len(nav_points):
                 rec = nav_points[idx]
@@ -246,29 +250,47 @@ class EbookMaker:
                     indent=INDENT_STEP,
                     label=label,
                     href=href, idx=counter.get_idx())
+                ret_xhtml += Markup(
+                    '{p}<li>\n' +
+                    '{p}<a href="{href}">{label}</a>\n' +
+                    ''
+                ).format(
+                    p=prefix,
+                    indent=INDENT_STEP,
+                    label=label,
+                    href=href, idx=counter.get_idx())
                 next_idx = idx + 1
                 if next_idx < len(nav_points):
                     next_level = nav_points[next_idx]['level']
                     if next_level > level:
-                        sub_ret, next_idx = get_nav_points(
+                        ret_xhtml += Markup('<ol>')
+                        sub_ret, sub_xhtml, next_idx = get_nav_points(
                             counter,
                             nav_points,
                             next_idx, next_level)
                         ret += sub_ret
+                        ret_xhtml += sub_xhtml
+                        ret_xhtml += Markup('</ol>')
                 idx = next_idx
                 ret += Markup(
                     '{p}</navPoint>\n'
                 ).format(p=prefix)
-            return ret, idx
+                ret_xhtml += Markup(
+                    '{p}</li>\n'
+                ).format(p=prefix)
+            return ret, ret_xhtml, idx
         nav_points_text = Markup('')
+        nav_points_xhtml = Markup('')
         counter = MyCounter()
         for file_nav_points in nav_points:
             counter.toc_html_text += Markup(
                 '<div style="margin-top: 1em;">\n'
             )
-            nav_points_text += get_nav_points(
+            nav_ncx, nav_xhtml, idx = get_nav_points(
                 counter, file_nav_points, 0, 1
-            )[0]
+            )
+            nav_points_text += nav_ncx
+            nav_points_xhtml += nav_xhtml
             counter.toc_html_text += Markup('</div>\n')
         content_text = self._toc_ncx_template.render(
             author_name=json_data['authors'][0]['name'],
@@ -277,6 +299,13 @@ class EbookMaker:
             url=uid_url,
         )
         _writestr("toc.ncx", content_text)
+        content_xhtml = self._nav_xhtml_template.render(
+            author_name=json_data['authors'][0]['name'],
+            nav_html_text=nav_points_xhtml,
+            title=json_data['title'],
+            url=uid_url,
+        )
+        _writestr("nav.xhtml", content_xhtml)
         content_text = self._toc_html_template.render(
             toc_html_text=counter.toc_html_text,
         )
