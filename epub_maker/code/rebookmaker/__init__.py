@@ -287,6 +287,13 @@ class EbookMaker:
             counter.toc_html_text += Markup(
                 '<div style="margin-top: 1em;">\n'
             )
+            if len(file_nav_points):
+                min_level = min([x['level'] for x in file_nav_points])
+                if min_level > 1:
+                    delta = min_level - 1
+                    for x in file_nav_points:
+                        x['level'] -= delta
+
             nav_ncx, nav_xhtml, idx = get_nav_points(
                 counter, file_nav_points, 0, 1
             )
