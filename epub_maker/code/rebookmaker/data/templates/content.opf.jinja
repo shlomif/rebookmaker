@@ -16,10 +16,13 @@
 </metadata>
 
 <manifest>
-{% for img in images0 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% for img in images0 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}" {% if img.media_type == 'image/webp' %}fallback="onepixel_png"{% endif %} />
 {% endfor %}
-{% for img in images1 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}"/>
+{% for img in images1 %}    <item id="{{ img.id }}" href="{{ img.href }}" media-type="{{ img.media_type }}" {% if img.media_type == 'image/webp' %}fallback="onepixel_png"{% endif %} />
 {% endfor %}
+{% if found_webp %}
+<item href="onepixel.png" id="onepixel_png" media-type="image/png" />
+{% endif %}
 <item id="nav" media-type="application/xhtml+xml" properties="nav" href="nav.xhtml"/>
 <item id="ncx" media-type="application/x-dtbncx+xml" href="toc.ncx"/>
 

@@ -42,7 +42,7 @@ INDENT_STEP = (' ' * 4)
 EPUB_COVER = ''''''
 
 
-def _get_image_type(filename):
+def _get_image_type(filename, found_webp):
     if filename.endswith('.jpeg'):
         return 'image/jpeg'
     if filename.endswith('.jpg'):
@@ -50,6 +50,7 @@ def _get_image_type(filename):
     if filename.endswith('.png'):
         return 'image/png'
     if filename.endswith('.webp'):
+        found_webp[0] = True
         return 'image/webp'
     raise IOError("unknown image extension for '{}'".format(filename))
 
@@ -75,6 +76,9 @@ class EbookMaker:
     """docstring for EbookMaker"""
     def __init__(self, compression=ZIP_STORED):
         self._compression = compression
+        self._templates_dirname = pkg_resources.resource_filename(
+            __name__, 'data/templates'
+        )
         self._env = Environment(
             autoescape=jinja2.select_autoescape(
                 disabled_extensions=('nonenone',),
@@ -82,8 +86,8 @@ class EbookMaker:
                 default_for_string=True,
             ),
             loader=FileSystemLoader([
-                pkg_resources.resource_filename(__name__, 'data/templates'),
-            ])
+                self._templates_dirname
+            ]),
         )
         self._cover_template = self._env.get_template('cover.html' + '.jinja')
         self._container_xml_template = self._env.get_template(
@@ -173,9 +177,33 @@ class EbookMaker:
             "META-INF/container.xml",
             self._container_xml_template.render(), ZIP_STORED)
         zip_obj.write("style.css", "OEBPS/style.css", _compression)
+        found_webp = [False]
+        images0 = [
+                {
+                    'id': 'coverimage',
+                    'href': cover_image_fn,
+                    'media_type': _get_image_type(
+                        filename=cover_image_fn,
+                        found_webp=found_webp,
+                     ),
+                    },
+                ]
         images = sorted(list(images))
+        images1 = [
+                {'id': 'image' + str(idx), 'href': fn,
+                    'media_type': _get_image_type(
+                        filename=fn,
+                        found_webp=found_webp,
+                        )}
+                for idx, fn in enumerate(images)
+                ]
         for img in images + [cover_image_fn]:
             zip_obj.write(img, 'OEBPS/' + img)
+        if found_webp[0]:
+            imgfn = 'onepixel.png'
+            zip_obj.write(
+                self._templates_dirname + '/' + imgfn, 'OEBPS/' + imgfn
+            )
         for html_src in htmls:
             zip_obj.write(html_src, 'OEBPS/' + html_src, _compression)
 
@@ -190,6 +218,9 @@ class EbookMaker:
         content_text = self._content_opf_template.render(
             author_sorted=json_data['authors'][0]['sort'],
             author_name=json_data['authors'][0]['name'],
+            found_webp=found_webp[0],
+            images0=images0,
+            images1=images1,
             modified_date=(
                 json_data['modified_date']
                 if ('modified_date' in json_data) else "2021-01-01T00:00:01Z"),
@@ -198,18 +229,6 @@ class EbookMaker:
             publisher=json_data['publisher'],
             title=json_data['title'],
             url=uid_url,
-            images0=[
-                {
-                    'id': 'coverimage',
-                    'href': cover_image_fn,
-                    'media_type': _get_image_type(cover_image_fn),
-                },
-            ],
-            images1=[
-                {'id': 'image' + str(idx), 'href': fn,
-                 'media_type': _get_image_type(fn)}
-                for idx, fn in enumerate(images)
-            ],
             guide=(json_data['guide'] if 'guide' in json_data else None),
             htmls0=[
                 {'id': 'item'+str(idx), 'href': fn}
