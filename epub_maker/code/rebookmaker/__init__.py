@@ -70,6 +70,9 @@ class MyCounter:
 
 
 RE = re.compile("[\\n\\r]*\\Z")
+STRIP_DOCTYPE__REGEX = re.compile(
+    "\\A((?:\\s*<\\?[^\\?]*\\?>)*)<!DOCTYPE[^>]*>"
+)
 
 
 class EbookMaker:
@@ -205,7 +208,15 @@ class EbookMaker:
                 self._templates_dirname + '/' + imgfn, 'OEBPS/' + imgfn
             )
         for html_src in htmls:
-            zip_obj.write(html_src, 'OEBPS/' + html_src, _compression)
+            if html_src.endswith(".xhtml"):
+                with open(html_src, 'rt') as file_handle:
+                    mytext = file_handle.read()
+                mytext = STRIP_DOCTYPE__REGEX.sub(
+                    "\\1", mytext, 0, re.M | re.S
+                )
+                zip_obj.writestr('OEBPS/' + html_src, mytext, _compression)
+            else:
+                zip_obj.write(html_src, 'OEBPS/' + html_src, _compression)
 
         def _writestr(basefn, content_text):
             zip_obj.writestr(
