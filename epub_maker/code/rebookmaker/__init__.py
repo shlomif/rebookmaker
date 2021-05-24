@@ -71,7 +71,8 @@ class MyCounter:
 
 RE = re.compile("[\\n\\r]*\\Z")
 STRIP_DOCTYPE__REGEX = re.compile(
-    "\\A((?:\\s*<\\?[^\\?]*\\?>)*)<!DOCTYPE[^>]*>"
+    "\\A((?:\\s*<\\?[^\\?]*\\?>)*)<!DOCTYPE[^>]*>",
+    re.M | re.S
 )
 
 
@@ -124,6 +125,9 @@ class EbookMaker:
         def _write_mimetype_file_first(zip_obj):
             """docstring for _write_mimetype_file_first"""
             zip_obj.writestr("mimetype", "application/epub+zip", ZIP_STORED)
+
+        def _path(fn):
+            return 'OEBPS/' + fn
         zip_obj = ZipFile(output_filename, 'w')
         _write_mimetype_file_first(zip_obj)
         images = set()
@@ -136,7 +140,7 @@ class EbookMaker:
         htmls = []
         for html_src in ['cover.xhtml']:
             zip_obj.writestr(
-                'OEBPS/' + html_src,
+                _path(html_src),
                 (self._cover_template.render(
                     tab="\t",
                     cover_image_fn=cover_image_fn,
@@ -201,22 +205,22 @@ class EbookMaker:
                 for idx, fn in enumerate(images)
                 ]
         for img in images + [cover_image_fn]:
-            zip_obj.write(img, 'OEBPS/' + img)
+            zip_obj.write(img, _path(img))
         if found_webp[0]:
             imgfn = 'onepixel.png'
             zip_obj.write(
-                self._templates_dirname + '/' + imgfn, 'OEBPS/' + imgfn
+                self._templates_dirname + '/' + imgfn, _path(imgfn)
             )
         for html_src in htmls:
             if html_src.endswith(".xhtml"):
                 with open(html_src, 'rt') as file_handle:
                     mytext = file_handle.read()
                 mytext = STRIP_DOCTYPE__REGEX.sub(
-                    "\\1", mytext, 0, re.M | re.S
+                    "\\1", mytext, 0
                 )
-                zip_obj.writestr('OEBPS/' + html_src, mytext, _compression)
+                zip_obj.writestr(_path(html_src), mytext, _compression)
             else:
-                zip_obj.write(html_src, 'OEBPS/' + html_src, _compression)
+                zip_obj.write(html_src, _path(html_src), _compression)
 
         def _writestr(basefn, content_text):
             zip_obj.writestr(
