@@ -7,7 +7,6 @@
 # Distributed under the terms of the MIT license.
 
 import os
-import sys
 
 from pydistman import DistManager
 
@@ -60,11 +59,6 @@ class Derived(DistManager):
                     self._bin_dest_write(fn)
 
 
-try:
-    cmd = sys.argv.pop(1)
-except IndexError:
-    cmd = 'build'
-
 dist_name = "rebookmaker"
 
 obj = Derived(
@@ -79,4 +73,4 @@ obj = Derived(
     full_name="Shlomi Fish",
     github_username="shlomif",
 )
-obj.run_command(cmd=cmd, args=[])
+obj.cli_run()
