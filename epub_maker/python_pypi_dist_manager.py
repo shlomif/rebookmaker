@@ -63,10 +63,10 @@ dist_name = "rebookmaker"
 
 obj = Derived(
     dist_name=dist_name,
-    dist_version="0.8.7",
+    dist_version="0.8.8",
     project_name="rebookmaker",
     project_short_description="EPUB generator",
-    release_date="2021-05-24",
+    release_date="2022-04-25",
     project_year="2020",
     aur_email="shlomif@cpan.org",
     project_email="shlomif@cpan.org",
