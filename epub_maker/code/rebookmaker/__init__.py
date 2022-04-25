@@ -32,7 +32,10 @@ from bs4 import BeautifulSoup
 import jinja2
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
-from jinja2 import Markup
+from markupsafe import Markup
+# from jinja2.utils.markupsafe import Markup
+# from jinja2.utils import Markup
+# from jinja2 import Markup
 
 import pkg_resources
 
