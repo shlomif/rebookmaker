@@ -165,7 +165,7 @@ class EbookMaker:
                 htmls.append(html_src)
                 with open(html_src, 'rt') as file_handle:
                     text = file_handle.read()
-                soup = BeautifulSoup(text, 'lxml')
+                soup = BeautifulSoup(text, features='lxml-xml', )
                 for img in soup.find_all('img'):
                     src = img['src']
                     if src:
