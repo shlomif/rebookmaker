@@ -1,3 +1,6 @@
+0.8.9
+    bs4 → beautifulsoup4
+
 0.8.8
     Update code for version 3.x.y of jinja2.
 
