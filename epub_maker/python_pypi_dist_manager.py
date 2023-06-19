@@ -39,6 +39,8 @@ class Derived(DistManager):
         self._dest_append("rebookmaker/rebookmaker", make_exe=True)
         globs = [[ext, "data/templates/*.{}".format(ext)] for
                  ext in ['jinja', 'png', 'xcf', ]]
+        for fn in ["{dest_dir}/rebookmaker/__main__.py", ]:
+            os.unlink(self._myformat(fn))
         for fn in ["{dest_dir}/setup.py", ]:
             self._re_mutate(
                 fn_proto=fn,
@@ -49,6 +51,12 @@ class Derived(DistManager):
                 (",".join(["'" + x[1] + "'" for x in globs])) +
                 "],}," +
                 "\n    scripts=['rebookmaker/rebookmaker'],",
+                )
+            self._re_mutate(
+                fn_proto=fn,
+                pattern="entry_points=\\{[^\\}]*\\},",
+                repl_fn_proto=None,
+                prefix="",
                 )
         self._dest_append("MANIFEST.in")
         for g in globs:
