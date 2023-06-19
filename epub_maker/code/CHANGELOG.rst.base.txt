@@ -1,3 +1,6 @@
+0.8.10
+    Fix the rebookmaker script
+
 0.8.9
     bs4 → beautifulsoup4
 
