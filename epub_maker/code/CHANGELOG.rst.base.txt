@@ -1,3 +1,6 @@
+0.8.11
+    Convert from the deprecated pkg_resources module to importlib_resources .
+
 0.8.10
     Fix the rebookmaker script
 

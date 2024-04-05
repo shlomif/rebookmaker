@@ -22,10 +22,11 @@ incompatible with @setanta 's .
 
 """
 
+from glob import glob
 import json
 import re
-from glob import glob
-from zipfile import ZIP_STORED, ZipFile
+from zipfile import ZIP_STORED
+from zipfile import ZipFile
 
 from bs4 import BeautifulSoup
 
@@ -37,7 +38,7 @@ from markupsafe import Markup
 # from jinja2.utils import Markup
 # from jinja2 import Markup
 
-import pkg_resources
+import importlib_resources
 
 INDENT_STEP = (' ' * 4)
 
@@ -59,9 +60,11 @@ def _get_image_type(filename, found_webp):
 
 
 class MyCounter:
+
+    """Utility class
+
     """
-    Utility class
-    """
+
     def __init__(self):
         self.counter = 0
         self.toc_html_text = Markup('')
@@ -83,8 +86,10 @@ class EbookMaker:
     """docstring for EbookMaker"""
     def __init__(self, compression=ZIP_STORED):
         self._compression = compression
-        self._templates_dirname = pkg_resources.resource_filename(
-            __name__, 'data/templates'
+        self._templates_dirname = str(
+            importlib_resources.files(
+                __name__
+            ).joinpath('data').joinpath('templates')
         )
         self._env = Environment(
             autoescape=jinja2.select_autoescape(
@@ -108,21 +113,22 @@ class EbookMaker:
         )
 
     def make_epub(self, json_fn, output_filename):
-        """
-        Prepare an EPUB inside output_filename from the
-        JSON file json_fn
-        """
+
+        """Prepare an EPUB inside output_filename from the JSON file json_fn"""
+
         with open(json_fn, 'rb') as file_handle:
             json_data = json.load(file_handle)
         return self.make_epub_from_data(json_data, output_filename)
 
     def make_epub_from_data(self, json_data, output_filename):
-        """
-        Prepare an EPUB inside output_filename from the
-        raw JSON-like data json_data.
+
+        """Prepare an EPUB inside output_filename from the raw JSON-like data
+
+        json_data.
 
         (Added at version 0.6.0 .)
         """
+
         _compression = self._compression
 
         def _write_mimetype_file_first(zip_obj):

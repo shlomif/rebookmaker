@@ -1,5 +1,6 @@
 beautifulsoup4
 jinja2>=3.0.1
+importlib_resources>=6.0
 lxml
 markupsafe
 pytest
