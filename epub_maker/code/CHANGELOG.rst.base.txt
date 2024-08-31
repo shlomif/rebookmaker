@@ -1,3 +1,6 @@
+0.8.12
+    Skip adding h[0-9] tags without an id="" attribute to get_nav_points
+
 0.8.11
     Convert from the deprecated pkg_resources module to importlib_resources .
 

@@ -180,7 +180,9 @@ class EbookMaker:
                     if h_elem.has_attr('id'):
                         href = html_src+"#"+h_elem['id']
                     else:
+                        # Skip
                         href = None
+                        continue
                     page_nav.append(
                         {
                             'level': int(h_elem.name[-1]),
